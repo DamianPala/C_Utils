@@ -1,3 +1,16 @@
 Debug/*
 Release/*
 .settings/
+auto
+docs
+examples
+release
+test
+.gitattributes
+.gitignore
+.travis.yml
+README.md
+eclipse
+rakefile.rb
+rakefile_helper.rb
+readme.txt

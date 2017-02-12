@@ -1,13 +1,12 @@
 /*=======================================================================================*
- * @file    source.c
+ * @file    TC_FIFO.c
  * @author  Damian Pala
- * @version 0.4
- * @date    XX-XX-20XX
- * @brief   This file contains all implementations for XXX module.
+ * @date    29-01-2017
+ * @brief   This file contains unit tests for Soft Timers module.
  *======================================================================================*/
 
 /**
- * @addtogroup XXX Description
+ * @addtogroup Soft Timers Unit Tests Description
  * @{
  * @brief Module for... .
  */
@@ -15,11 +14,13 @@
 /*======================================================================================*/
 /*                       ####### PREPROCESSOR DIRECTIVES #######                        */
 /*======================================================================================*/
-/*-------------------------------- INCLUDE DIRECTIVES ----------------------------------*/
-#include <stdint.h>
-#include <stdbool.h>
+/*---------------------- INCLUDE DIRECTIVES FOR STANDARD HEADERS -----------------------*/
 
-#include "FIFO.h"
+/*----------------------- INCLUDE DIRECTIVES FOR OTHER HEADERS -------------------------*/
+#include "unity.h"
+#include "unity_fixture.h"
+
+#include "FIFO.c"
 
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
 
@@ -40,129 +41,62 @@
 /*--------------------------------- EXPORTED OBJECTS -----------------------------------*/
 
 /*---------------------------------- LOCAL OBJECTS -------------------------------------*/
+TEST_GROUP(FIFO);
 
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
-static inline void CheckIsFullAndSetFlag(FIFO_T *fifo);
-static inline void CheckIsEmptyAndSetFlag(FIFO_T *fifo);
-static inline void ShouldHeadBeWraparound(FIFO_T *fifo);
-static inline void ShouldTailBeWraparound(FIFO_T *fifo);
 
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
 /*======================================================================================*/
-static inline void CheckIsFullAndSetFlag(FIFO_T *fifo)
-{
-  if ( ( (fifo->head == fifo->itemsInFifo) && (0 == fifo->tail) ) ||
-     ( (fifo->head == fifo->tail) && (fifo->tail != 0)) )
-  {
-    fifo->isFull = true;
-  }
-  else
-  {
-    fifo->isFull = false;
-  }
-}
-
-static inline void CheckIsEmptyAndSetFlag(FIFO_T *fifo)
-{
-  if (fifo->head == fifo->tail)
-  {
-    fifo->isEmpty = true;
-  }
-  else
-  {
-    fifo->isFull = false;
-  }
-}
-
-static inline void ShouldHeadBeWraparound(FIFO_T *fifo)
-{
-  if (fifo->head == fifo->itemsInFifo)
-  {
-    fifo->head = 0;
-  }
-  else
-  {
-    /* Do nothing */
-  }
-}
-
-static inline void ShouldTailBeWraparound(FIFO_T *fifo)
-{
-  if (fifo->tail == fifo->itemsInFifo)
-  {
-    fifo->tail = 0;
-  }
-  else
-  {
-    /* Do nothing */
-  }
-}
 
 /*======================================================================================*/
-/*                  ####### EXPORTED FUNCTIONS DEFINITIONS #######                      */
+/*                        ####### TESTS DEFINITIONS #######                             */
 /*======================================================================================*/
-bool FIFO_PushItem(FIFO_T *fifo, void *pToItem)
+TEST_SETUP(FIFO)
 {
-  bool ret;
 
-  if (fifo->isFull != true)
-  {
-    ShouldHeadBeWraparound(fifo);
-
-    uint16_t offset = fifo->head * fifo->itemSize;
-
-    for (uint16_t byteCnt = 0; byteCnt < fifo->itemSize; byteCnt++)
-    {
-      fifo->buffer[offset + byteCnt] = ((uint8_t*)pToItem)[byteCnt];
-    }
-
-    fifo->head++;
-
-    fifo->isEmpty = false;
-    CheckIsFullAndSetFlag(fifo);
-
-    ret = true;
-  }
-  else
-  {
-    ret = false;
-  }
-
-  return ret;
 }
 
-bool FIFO_PopItem(FIFO_T *fifo, void *pToItem)
+TEST_TEAR_DOWN(FIFO)
 {
-  bool ret;
 
-  if (fifo->isEmpty != true)
-  {
-    uint16_t offset = fifo->tail * fifo->itemSize;
-
-    for (uint16_t byteCnt = 0; byteCnt < fifo->itemSize; byteCnt++)
-    {
-      ((uint8_t*)pToItem)[byteCnt] = fifo->buffer[offset + byteCnt];
-    }
-
-    fifo->tail++;
-
-    fifo->isFull = false;
-    CheckIsEmptyAndSetFlag(fifo);
-
-    ShouldTailBeWraparound(fifo);
-
-    ret = true;
-  }
-  else
-  {
-    ret = false;
-  }
-
-  return ret;
 }
+
+TEST(FIFO, FIFO_should_PushAndPopItemsProperly)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 5};
+
+  uint32_t item1 = 0xABCDEFAC;
+  uint32_t item2 = 0xABCDEFDD;
+  uint32_t item3 = 0xAACC;
+  uint32_t item4 = 0x00;
+  uint32_t item5 = 0xFFFFFFFF;
+  uint32_t poppedItem = 0;
+
+  FIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+
+  FIFO_PushItem(&myFifo, (void*)&item1);
+  FIFO_PushItem(&myFifo, (void*)&item2);
+  FIFO_PushItem(&myFifo, (void*)&item3);
+  FIFO_PushItem(&myFifo, (void*)&item4);
+  FIFO_PushItem(&myFifo, (void*)&item5);
+
+  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_HEX32(item1, poppedItem);
+  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item2, poppedItem);
+  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item3, poppedItem);
+  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item4, poppedItem);
+  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item5, poppedItem);
+}
+
+
 
 /**
  * @}

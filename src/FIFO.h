@@ -8,8 +8,8 @@
  *          This file contains API of XXX module
  *======================================================================================*/
 /*----------------------- DEFINE TO PREVENT RECURSIVE INCLUSION ------------------------*/
-#ifndef XXX_H_
-#define XXX_H_
+#ifndef FIFO_H_
+#define FIFO_H_
 
 /**
  * @addtogroup XXX Description
@@ -71,10 +71,6 @@ bool FIFO_PushItem(FIFO_T *fifo, void *pToItem);
 bool FIFO_PopItem(FIFO_T *fifo, void *pToItem);
 uint16_t FIFO_GetItemsNumber(FIFO_T *fifo);
 
-
-
-void FIFO_Test(FIFO_T *fifo);
-
 /*======================================================================================*/
 /*                          ####### INLINE FUNCTIONS #######                            */
 /*======================================================================================*/
@@ -83,4 +79,4 @@ void FIFO_Test(FIFO_T *fifo);
  * @}
  */
 
-#endif /* XXX_H_ */
+#endif /* FIFO_H_ */
