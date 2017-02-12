@@ -36,8 +36,10 @@
     .buffer = name ## _buffer, \
     .itemSize = item_size, \
     .itemsInFifo = items_in_fifo, \
+    .itemsCnt = 0, \
     .isEmpty = true, \
     .isFull = false, \
+    .overwriteLastItems = false \
   }
 
 /*======================================================================================*/
@@ -56,8 +58,10 @@ typedef struct FIFO_Tag
   uint8_t *buffer;
   uint16_t itemSize;
   uint16_t itemsInFifo;
+  uint16_t itemsCnt;
   bool isEmpty;
   bool isFull;
+  bool overwriteLastItems;
 } FIFO_T;
 
 /*======================================================================================*/
@@ -70,6 +74,11 @@ typedef struct FIFO_Tag
 bool FIFO_PushItem(FIFO_T *fifo, void *pToItem);
 bool FIFO_PopItem(FIFO_T *fifo, void *pToItem);
 uint16_t FIFO_GetItemsNumber(FIFO_T *fifo);
+void FIFO_Clear(FIFO_T *fifo);
+bool FIFO_IsEmpty(FIFO_T *fifo);
+bool FIFO_IsFull(FIFO_T *fifo);
+uint8_t FIFO_ItemsInFifo(FIFO_T *fifo);
+void FIFO_OverwriteLastItems(FIFO_T *fifo, bool overwritable);
 
 /*======================================================================================*/
 /*                          ####### INLINE FUNCTIONS #######                            */

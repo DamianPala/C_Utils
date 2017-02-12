@@ -64,10 +64,11 @@ TEST_TEAR_DOWN(FIFO)
 
 }
 
-TEST(FIFO, FIFO_should_PushAndPopItemsProperly)
+TEST(FIFO, FIFO_should_PushAndPopAndCountItemsProperlyAndReturnFalseWhenFullOrEmpty)
 {
   enum {ITEM_SIZE = 4};
   enum {ITEM_NUMBER = 5};
+  bool pushRet, popRet;
 
   uint32_t item1 = 0xABCDEFAC;
   uint32_t item2 = 0xABCDEFDD;
@@ -78,22 +79,316 @@ TEST(FIFO, FIFO_should_PushAndPopItemsProperly)
 
   FIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
 
-  FIFO_PushItem(&myFifo, (void*)&item1);
-  FIFO_PushItem(&myFifo, (void*)&item2);
-  FIFO_PushItem(&myFifo, (void*)&item3);
-  FIFO_PushItem(&myFifo, (void*)&item4);
-  FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
 
-  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_FALSE(popRet);
+
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item1);
+  TEST_ASSERT_TRUE(pushRet);
+
+  TEST_ASSERT_FALSE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(1, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item2);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item3);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+
+  TEST_ASSERT_FALSE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_TRUE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
   TEST_ASSERT_EQUAL_HEX32(item1, poppedItem);
-  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+
+  TEST_ASSERT_FALSE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(4, FIFO_ItemsInFifo(&myFifo));
+
+  TEST_ASSERT_TRUE(popRet);
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
   TEST_ASSERT_EQUAL_UINT32(item2, poppedItem);
-  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
   TEST_ASSERT_EQUAL_UINT32(item3, poppedItem);
-  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
   TEST_ASSERT_EQUAL_UINT32(item4, poppedItem);
-  FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
   TEST_ASSERT_EQUAL_UINT32(item5, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item1);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item2);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item3);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+
+  TEST_ASSERT_FALSE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_TRUE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_HEX32(item1, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item2, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+
+  TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_FALSE(pushRet);
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_FALSE(pushRet);
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item3, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(4, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item4, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item5, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+
+  TEST_ASSERT_FALSE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(2, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(4, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_HEX32(item4, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item5, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(2, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_HEX32(item4, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(1, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item5, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+}
+
+TEST(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSize)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 5};
+  bool pushRet, popRet;
+
+  uint32_t item1 = 0xABCDEFAC;
+  uint32_t item2 = 0xABCDEFDD;
+  uint32_t item3 = 0xAACC;
+  uint32_t item4 = 0x00;
+  uint32_t item5 = 0xFFFFFFFF;
+  uint32_t item6 = 0xFFAAFFFF;
+  uint32_t poppedItem = 0;
+
+  FIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+  FIFO_OverwriteLastItems(&myFifo, true);
+
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_FALSE(popRet);
+
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item1);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(1, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item2);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(2, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item3);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(4, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item6);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item1);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item2);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item3);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_HEX32(item1, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(4, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item2, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item3, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(2, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item4, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(1, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item5, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_FALSE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+}
+
+TEST(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSizeIterationTest)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 5};
+  bool pushRet, popRet;
+
+  uint32_t item1 = 0xABCDEFAC;
+  uint32_t item2 = 0xABCDEFDD;
+  uint32_t item3 = 0xAACC;
+  uint32_t item4 = 0x00;
+  uint32_t item5 = 0xFFFFFFFF;
+  uint32_t item6 = 0xFFAAFFFF;
+  uint32_t poppedItem = 0;
+
+  FIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+  FIFO_OverwriteLastItems(&myFifo, true);
+
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_FALSE(popRet);
+
+  TEST_ASSERT_TRUE(FIFO_IsEmpty(&myFifo));
+  TEST_ASSERT_FALSE(FIFO_IsFull(&myFifo));
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item1);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(1, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item2);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(2, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item3);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(4, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item6);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item1);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item2);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item3);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item4);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+  pushRet = FIFO_PushItem(&myFifo, (void*)&item5);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT16(5, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_HEX32(item1, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(4, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item2, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(3, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item3, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(2, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item4, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(1, FIFO_ItemsInFifo(&myFifo));
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_EQUAL_UINT32(item5, poppedItem);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
+
+  popRet = FIFO_PopItem(&myFifo, (void*)&poppedItem);
+  TEST_ASSERT_FALSE(popRet);
+  TEST_ASSERT_EQUAL_UINT16(0, FIFO_ItemsInFifo(&myFifo));
 }
 
 

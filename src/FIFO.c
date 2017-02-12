@@ -44,39 +44,12 @@
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
-static inline void CheckIsFullAndSetFlag(FIFO_T *fifo);
-static inline void CheckIsEmptyAndSetFlag(FIFO_T *fifo);
 static inline void ShouldHeadBeWraparound(FIFO_T *fifo);
 static inline void ShouldTailBeWraparound(FIFO_T *fifo);
 
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
 /*======================================================================================*/
-static inline void CheckIsFullAndSetFlag(FIFO_T *fifo)
-{
-  if ( ( (fifo->head == fifo->itemsInFifo) && (0 == fifo->tail) ) ||
-     ( (fifo->head == fifo->tail) && (fifo->tail != 0)) )
-  {
-    fifo->isFull = true;
-  }
-  else
-  {
-    fifo->isFull = false;
-  }
-}
-
-static inline void CheckIsEmptyAndSetFlag(FIFO_T *fifo)
-{
-  if (fifo->head == fifo->tail)
-  {
-    fifo->isEmpty = true;
-  }
-  else
-  {
-    fifo->isFull = false;
-  }
-}
-
 static inline void ShouldHeadBeWraparound(FIFO_T *fifo)
 {
   if (fifo->head == fifo->itemsInFifo)
@@ -91,9 +64,13 @@ static inline void ShouldHeadBeWraparound(FIFO_T *fifo)
 
 static inline void ShouldTailBeWraparound(FIFO_T *fifo)
 {
-  if (fifo->tail == fifo->itemsInFifo)
+  if ( (fifo->tail == fifo->itemsInFifo) && ( fifo->tail > fifo->head) )
   {
     fifo->tail = 0;
+  }
+  else if (fifo->tail > fifo->itemsInFifo)
+  {
+    fifo->tail = 1;
   }
   else
   {
@@ -108,7 +85,7 @@ bool FIFO_PushItem(FIFO_T *fifo, void *pToItem)
 {
   bool ret;
 
-  if (fifo->isFull != true)
+  if ( (false == FIFO_IsFull(fifo)) || (true == fifo->overwriteLastItems))
   {
     ShouldHeadBeWraparound(fifo);
 
@@ -121,8 +98,17 @@ bool FIFO_PushItem(FIFO_T *fifo, void *pToItem)
 
     fifo->head++;
 
+    if ((true == FIFO_IsFull(fifo)) && (true == fifo->overwriteLastItems))
+    {
+      fifo->tail++;
+      ShouldTailBeWraparound(fifo);
+    }
+    else
+    {
+      fifo->itemsCnt++;
+    }
+
     fifo->isEmpty = false;
-    CheckIsFullAndSetFlag(fifo);
 
     ret = true;
   }
@@ -138,7 +124,7 @@ bool FIFO_PopItem(FIFO_T *fifo, void *pToItem)
 {
   bool ret;
 
-  if (fifo->isEmpty != true)
+  if (false == FIFO_IsEmpty(fifo))
   {
     uint16_t offset = fifo->tail * fifo->itemSize;
 
@@ -150,7 +136,17 @@ bool FIFO_PopItem(FIFO_T *fifo, void *pToItem)
     fifo->tail++;
 
     fifo->isFull = false;
-    CheckIsEmptyAndSetFlag(fifo);
+
+    fifo->itemsCnt--;
+
+    if (true == FIFO_IsEmpty(fifo))
+    {
+      FIFO_Clear(fifo);
+    }
+    else
+    {
+      /* Do nothing */
+    }
 
     ShouldTailBeWraparound(fifo);
 
@@ -162,6 +158,48 @@ bool FIFO_PopItem(FIFO_T *fifo, void *pToItem)
   }
 
   return ret;
+}
+
+void FIFO_Clear(FIFO_T *fifo)
+{
+  fifo->head = 0;
+  fifo->tail = 0;
+  fifo->isEmpty = true;
+  fifo->isFull = false;
+}
+
+bool FIFO_IsEmpty(FIFO_T *fifo)
+{
+  if (0 == fifo->itemsCnt)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool FIFO_IsFull(FIFO_T *fifo)
+{
+  if (fifo->itemsCnt == fifo->itemsInFifo)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+uint8_t FIFO_ItemsInFifo(FIFO_T *fifo)
+{
+  return fifo->itemsCnt;
+}
+
+void FIFO_OverwriteLastItems(FIFO_T *fifo, bool overwritable)
+{
+  fifo->overwriteLastItems = overwritable;
 }
 
 /**

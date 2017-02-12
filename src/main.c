@@ -30,7 +30,9 @@
 /*======================================================================================*/
 TEST_GROUP_RUNNER(FIFO)
 {
-  RUN_TEST_CASE(FIFO, FIFO_should_PushAndPopItemsProperly);
+  RUN_TEST_CASE(FIFO, FIFO_should_PushAndPopAndCountItemsProperlyAndReturnFalseWhenFullOrEmpty);
+  RUN_TEST_CASE(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSize);
+  RUN_TEST_CASE(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSizeIterationTest);
 }
 
 /*======================================================================================*/
