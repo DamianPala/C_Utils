@@ -50,10 +50,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.779913127" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.1274263621.792042873" name="S-FIFO.c" rcbsApplicability="disable" resourcePath="src/S-FIFO.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1675605835.1841789862">
+						<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1675605835.1841789862" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1675605835"/>
+					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Unity/extras/fixture/src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Unity/src"/>
-						<entry excluding="FIFO.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="S-FIFO.c|FIFO.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

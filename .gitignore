@@ -1,8 +1,8 @@
 Debug/*
 Release/*
 .settings/
+Unity/docs
 auto
-docs
 examples
 release
 test

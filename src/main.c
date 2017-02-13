@@ -1,16 +1,9 @@
 /*=======================================================================================*
- * @file    source.c
+ * @file    main.c
  * @author  Damian Pala
- * @version 0.4
- * @date    XX-XX-20XX
- * @brief   This file contains all implementations for XXX module.
+ * @date    12-02-2017
+ * @brief   This file contains code for main file.
  *======================================================================================*/
-
-/**
- * @addtogroup XXX Description
- * @{
- * @brief Module for... .
- */
 
 /*======================================================================================*/
 /*                       ####### PREPROCESSOR DIRECTIVES #######                        */
@@ -33,6 +26,9 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(FIFO, FIFO_should_PushAndPopAndCountItemsProperlyAndReturnFalseWhenFullOrEmpty);
   RUN_TEST_CASE(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSize);
   RUN_TEST_CASE(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSizeIterationTest);
+  RUN_TEST_CASE(FIFO, FIFO_should_BeClearedProperly);
+  RUN_TEST_CASE(FIFO, FIFO_should_WorkProperlyOnHugeItemNumber);
+  RUN_TEST_CASE(FIFO, FIFO_should_WorkProperlyOnHugeItemSize);
 }
 
 /*======================================================================================*/
@@ -71,7 +67,3 @@ int main(int argc, const char * argv[])
 {
   return UnityMain(argc, argv, RunAllTests);
 }
-
-/**
- * @}
- */

@@ -1,15 +1,14 @@
 /*=======================================================================================*
- * @file    source.c
+ * @file    S-FIFO.c
  * @author  Damian Pala
- * @version 0.4
- * @date    XX-XX-20XX
- * @brief   This file contains all implementations for XXX module.
+ * @date    12-02-2017
+ * @brief   This file contains all implementations for S-FIFO module.
  *======================================================================================*/
 
 /**
- * @addtogroup XXX Description
+ * @addtogroup S-FIFO Static FIFO Queue
  * @{
- * @brief Module for... .
+ * @brief This module contains implementation of Static FIFO.
  */
 
 /*======================================================================================*/
@@ -19,7 +18,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "FIFO.h"
+#include "S-FIFO.h"
 
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
 
@@ -44,31 +43,32 @@
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
-static inline void ShouldHeadBeWraparound(FIFO_T *fifo);
-static inline void ShouldTailBeWraparound(FIFO_T *fifo);
+static inline bool ShouldHeadBeWraparound(SFIFO_T *fifo);
+static inline void ShouldTailBeWraparound(SFIFO_T *fifo);
 
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
 /*======================================================================================*/
-static inline void ShouldHeadBeWraparound(FIFO_T *fifo)
+static inline bool ShouldHeadBeWraparound(SFIFO_T *fifo)
 {
-  if (fifo->head == fifo->itemsInFifo)
+  if (fifo->head == fifo->queueSizeInItems - 1)
   {
     fifo->head = 0;
+    return true;
   }
   else
   {
-    /* Do nothing */
+    return false;
   }
 }
 
-static inline void ShouldTailBeWraparound(FIFO_T *fifo)
+static inline void ShouldTailBeWraparound(SFIFO_T *fifo)
 {
-  if ( (fifo->tail == fifo->itemsInFifo) && ( fifo->tail > fifo->head) )
+  if ( (fifo->tail == fifo->queueSizeInItems) && ( fifo->tail > fifo->head - 1) )
   {
     fifo->tail = 0;
   }
-  else if (fifo->tail > fifo->itemsInFifo)
+  else if (fifo->tail > fifo->queueSizeInItems)
   {
     fifo->tail = 1;
   }
@@ -81,24 +81,34 @@ static inline void ShouldTailBeWraparound(FIFO_T *fifo)
 /*======================================================================================*/
 /*                  ####### EXPORTED FUNCTIONS DEFINITIONS #######                      */
 /*======================================================================================*/
-bool FIFO_PushItem(FIFO_T *fifo, void *pToItem)
+bool SFIFO_PushItem(SFIFO_T *fifo, void *pToItem)
 {
   bool ret;
 
-  if ( (false == FIFO_IsFull(fifo)) || (true == fifo->overwriteLastItems))
+  if ( (false == SFIFO_IsFull(fifo)) || (true == fifo->overwriteLastItems))
   {
-    ShouldHeadBeWraparound(fifo);
+    uint16_t offset;
+    bool isWraparoundOccurred;
 
-    uint16_t offset = fifo->head * fifo->itemSize;
+    isWraparoundOccurred = ShouldHeadBeWraparound(fifo);
+
+    if ( (fifo->itemsCnt > 0) && (false == isWraparoundOccurred) )
+    {
+      fifo->head++;
+    }
+    else
+    {
+      /* Do nothing */
+    }
+
+    offset = fifo->head * fifo->itemSize;
 
     for (uint16_t byteCnt = 0; byteCnt < fifo->itemSize; byteCnt++)
     {
       fifo->buffer[offset + byteCnt] = ((uint8_t*)pToItem)[byteCnt];
     }
 
-    fifo->head++;
-
-    if ((true == FIFO_IsFull(fifo)) && (true == fifo->overwriteLastItems))
+    if ((true == SFIFO_IsFull(fifo)) && (true == fifo->overwriteLastItems))
     {
       fifo->tail++;
       ShouldTailBeWraparound(fifo);
@@ -120,11 +130,11 @@ bool FIFO_PushItem(FIFO_T *fifo, void *pToItem)
   return ret;
 }
 
-bool FIFO_PopItem(FIFO_T *fifo, void *pToItem)
+bool SFIFO_PopItem(SFIFO_T *fifo, void *pToItem)
 {
   bool ret;
 
-  if (false == FIFO_IsEmpty(fifo))
+  if (false == SFIFO_IsEmpty(fifo))
   {
     uint16_t offset = fifo->tail * fifo->itemSize;
 
@@ -139,9 +149,9 @@ bool FIFO_PopItem(FIFO_T *fifo, void *pToItem)
 
     fifo->itemsCnt--;
 
-    if (true == FIFO_IsEmpty(fifo))
+    if (true == SFIFO_IsEmpty(fifo))
     {
-      FIFO_Clear(fifo);
+      SFIFO_Clear(fifo);
     }
     else
     {
@@ -160,15 +170,16 @@ bool FIFO_PopItem(FIFO_T *fifo, void *pToItem)
   return ret;
 }
 
-void FIFO_Clear(FIFO_T *fifo)
+void SFIFO_Clear(SFIFO_T *fifo)
 {
   fifo->head = 0;
   fifo->tail = 0;
   fifo->isEmpty = true;
   fifo->isFull = false;
+  fifo->itemsCnt = 0;
 }
 
-bool FIFO_IsEmpty(FIFO_T *fifo)
+bool SFIFO_IsEmpty(SFIFO_T *fifo)
 {
   if (0 == fifo->itemsCnt)
   {
@@ -180,9 +191,9 @@ bool FIFO_IsEmpty(FIFO_T *fifo)
   }
 }
 
-bool FIFO_IsFull(FIFO_T *fifo)
+bool SFIFO_IsFull(SFIFO_T *fifo)
 {
-  if (fifo->itemsCnt == fifo->itemsInFifo)
+  if (fifo->itemsCnt == fifo->queueSizeInItems)
   {
     return true;
   }
@@ -192,16 +203,16 @@ bool FIFO_IsFull(FIFO_T *fifo)
   }
 }
 
-uint8_t FIFO_ItemsInFifo(FIFO_T *fifo)
+uint16_t SFIFO_GetItemsInFifo(SFIFO_T *fifo)
 {
   return fifo->itemsCnt;
 }
 
-void FIFO_OverwriteLastItems(FIFO_T *fifo, bool overwritable)
+void SFIFO_OverwriteLastItems(SFIFO_T *fifo, bool overwritable)
 {
   fifo->overwriteLastItems = overwritable;
 }
 
 /**
- * @}
+ * @} end of group S-FIFO Static FIFO Queue
  */
