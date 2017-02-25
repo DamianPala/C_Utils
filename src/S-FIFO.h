@@ -43,15 +43,15 @@
   static uint8_t name ## _buffer[item_size * queue_size_in_items]; \
   static SFIFO_T name ## _data = \
   { \
-    .head = 0, \
-    .tail = 0, \
-    .buffer = name ## _buffer, \
-    .itemSize = item_size, \
-    .queueSizeInItems = queue_size_in_items, \
-    .itemsCnt = 0, \
-    .isEmpty = true, \
-    .isFull = false, \
-    .overwriteLastItems = false \
+    0, \
+    0, \
+    name ## _buffer, \
+    item_size, \
+    queue_size_in_items, \
+    0, \
+    true, \
+    false, \
+    false \
   }; \
   static SFIFO_T * name = &name ## _data;
 
