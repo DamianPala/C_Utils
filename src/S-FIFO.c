@@ -170,6 +170,29 @@ bool SFIFO_PopItem(SFIFO_T *fifo, void *pToItem)
   return ret;
 }
 
+bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem)
+{
+  bool ret;
+
+  if ( (false == SFIFO_IsEmpty(fifo)) && (itemIndex < fifo->itemsCnt) )
+  {
+    uint16_t offset = fifo->itemSize * (fifo->tail + itemIndex);
+
+    for (uint16_t byteCnt = 0; byteCnt < fifo->itemSize; byteCnt++)
+    {
+      ((uint8_t*)pToItem)[byteCnt] = fifo->buffer[offset + byteCnt];
+    }
+
+    ret = true;
+  }
+  else
+  {
+    ret = false;
+  }
+
+  return ret;
+}
+
 void SFIFO_Clear(SFIFO_T *fifo)
 {
   fifo->head = 0;

@@ -55,6 +55,28 @@
   }; \
   static SFIFO_T * name = &name ## _data;
 
+/**
+ * @brief Macro function responsible for memory allocation, queue object and handle creation. Volatile type.
+ * @param [in] name is the name of queue handle
+ * @param [in] item_size is the item size in bytes
+ * @param [in] queue_size_in_items is the size of queue counted in items
+ */
+#define SFIFO_CreateVolatile(name, item_size, queue_size_in_items) \
+  static volatile uint8_t name ## _buffer[item_size * queue_size_in_items]; \
+  static volatile SFIFO_T name ## _data = \
+  { \
+    0, \
+    0, \
+    name ## _buffer, \
+    item_size, \
+    queue_size_in_items, \
+    0, \
+    true, \
+    false, \
+    false \
+  }; \
+  static volatile SFIFO_T * name = &name ## _data;
+
 /*======================================================================================*/
 /*                     ####### EXPORTED TYPE DECLARATIONS #######                       */
 /*======================================================================================*/
@@ -104,6 +126,18 @@ bool SFIFO_PushItem(SFIFO_T *fifo, void *pToItem);
  * @retval  false if queue is empty
  */
 bool SFIFO_PopItem(SFIFO_T *fifo, void *pToItem);
+
+
+/**
+ * @brief   This function gets item from queue on given index.
+ * @param   [in] fifo       is queue handle equals name of created FIFO queue
+ * @param   [in] itemIndex  is index of item to get
+ * @param   [out] pToItem   is pointer to place where obtained item should be written
+ * @return  Result of the getting operation.
+ * @retval  true if item got properly
+ * @retval  false if queue is empty
+ */
+bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem);
 
 
 /**

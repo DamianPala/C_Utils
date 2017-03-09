@@ -514,6 +514,54 @@ TEST(FIFO, FIFO_should_WorkProperlyOnHugeItemSize)
   TEST_ASSERT_EQUAL_UINT16(0, SFIFO_GetItemsInFifo(myFifo));
 }
 
+TEST(FIFO, FIFO_should_GetItemProperly)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 10000};
+  bool pushRet, getRet;
+  uint32_t item;
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER; itemCnt++)
+  {
+    pushRet = SFIFO_PushItem(myFifo, (void*)&itemCnt);
+    TEST_ASSERT_TRUE(pushRet);
+    TEST_ASSERT_EQUAL_UINT16(itemCnt + 1, SFIFO_GetItemsInFifo(myFifo));
+  }
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER; itemCnt++)
+  {
+    getRet = SFIFO_GetItem(myFifo, itemCnt, (void*)&item);
+    TEST_ASSERT_TRUE(getRet);
+    TEST_ASSERT_EQUAL_UINT16(itemCnt, item);
+  }
+}
+
+TEST(FIFO, SFIFO_GetItem_should_ReturnFalseWhenTryToGetNotExistItem)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 10};
+  bool pushRet, getRet;
+  uint32_t item;
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER; itemCnt++)
+  {
+    pushRet = SFIFO_PushItem(myFifo, (void*)&itemCnt);
+    TEST_ASSERT_TRUE(pushRet);
+    TEST_ASSERT_EQUAL_UINT16(itemCnt + 1, SFIFO_GetItemsInFifo(myFifo));
+  }
+
+  getRet = SFIFO_GetItem(myFifo, ITEM_NUMBER, (void*)&item);
+  TEST_ASSERT_FALSE(getRet);
+
+  SFIFO_Clear(myFifo);
+  getRet = SFIFO_GetItem(myFifo, 1, (void*)&item);
+  TEST_ASSERT_FALSE(getRet);
+}
+
 
 /**
  * @} end of group TC_S-FIFO Static FIFO Queue unit tests

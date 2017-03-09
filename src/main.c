@@ -29,6 +29,8 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(FIFO, FIFO_should_BeClearedProperly);
   RUN_TEST_CASE(FIFO, FIFO_should_WorkProperlyOnHugeItemNumber);
   RUN_TEST_CASE(FIFO, FIFO_should_WorkProperlyOnHugeItemSize);
+  RUN_TEST_CASE(FIFO, FIFO_should_GetItemProperly);
+  RUN_TEST_CASE(FIFO, SFIFO_GetItem_should_ReturnFalseWhenTryToGetNotExistItem);
 }
 
 /*======================================================================================*/
