@@ -67,7 +67,7 @@
   { \
     0, \
     0, \
-    name ## _buffer, \
+    (uint8_t*)name ## _buffer, \
     item_size, \
     queue_size_in_items, \
     0, \
