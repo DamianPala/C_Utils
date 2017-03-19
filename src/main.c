@@ -31,6 +31,10 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(FIFO, FIFO_should_WorkProperlyOnHugeItemSize);
   RUN_TEST_CASE(FIFO, FIFO_should_GetItemProperly);
   RUN_TEST_CASE(FIFO, SFIFO_GetItem_should_ReturnFalseWhenTryToGetNotExistItem);
+
+  RUN_TEST_CASE(CRC, CRC8_should_BeCalculatedProperly);
+  RUN_TEST_CASE(CRC, CRC16_should_BeCalculatedProperly);
+  RUN_TEST_CASE(CRC, CRC32_should_BeCalculatedProperly);
 }
 
 /*======================================================================================*/
