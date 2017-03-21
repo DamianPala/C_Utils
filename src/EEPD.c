@@ -1,46 +1,29 @@
 /*=======================================================================================*
- * @file    main.c
+ * @file    EEPD.c
  * @author  Damian Pala
- * @date    12-02-2017
- * @brief   This file contains code for main file.
+ * @date    19-03-2017
+ * @brief   This file contains all implementations for EEPD module.
  *======================================================================================*/
+
+/**
+ * @addtogroup EEPD Description
+ * @{
+  * @brief Module for emulating EEPROM memory.
+ */
 
 /*======================================================================================*/
 /*                       ####### PREPROCESSOR DIRECTIVES #######                        */
 /*======================================================================================*/
 /*-------------------------------- INCLUDE DIRECTIVES ----------------------------------*/
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 
-#include "unity_fixture.h"
+#include "EEPD.h"
 
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
 
 /*---------------------------- LOCAL FUNCTION-LIKE MACROS ------------------------------*/
-
-/*======================================================================================*/
-/*                           ####### TESTS GROUPS #######                               */
-/*======================================================================================*/
-TEST_GROUP_RUNNER(FIFO)
-{
-  RUN_TEST_CASE(FIFO, FIFO_should_PushAndPopAndCountItemsProperlyAndReturnFalseWhenFullOrEmpty);
-  RUN_TEST_CASE(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSize);
-  RUN_TEST_CASE(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSizeIterationTest);
-  RUN_TEST_CASE(FIFO, FIFO_should_BeClearedProperly);
-  RUN_TEST_CASE(FIFO, FIFO_should_WorkProperlyOnHugeItemNumber);
-  RUN_TEST_CASE(FIFO, FIFO_should_WorkProperlyOnHugeItemSize);
-  RUN_TEST_CASE(FIFO, FIFO_should_GetItemProperly);
-  RUN_TEST_CASE(FIFO, SFIFO_GetItem_should_ReturnFalseWhenTryToGetNotExistItem);
-
-  RUN_TEST_CASE(CRC, CRC8_should_BeCalculatedProperly);
-  RUN_TEST_CASE(CRC, CRC16_should_BeCalculatedProperly);
-  RUN_TEST_CASE(CRC, CRC32_should_BeCalculatedProperly);
-
-  RUN_TEST_CASE(SEEPM, SEEPM_should_ReturnEmptyStatusWhenMemoryIsVirgin);
-  RUN_TEST_CASE(SEEPM, EEPD_should_WriteAndReadProperly);
-  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadSmallItemProperly);
-  RUN_TEST_CASE(SEEPM, SEEPM_should_NotWriteToBigItems);
-}
 
 /*======================================================================================*/
 /*                      ####### LOCAL TYPE DECLARATIONS #######                         */
@@ -57,24 +40,34 @@ TEST_GROUP_RUNNER(FIFO)
 /*--------------------------------- EXPORTED OBJECTS -----------------------------------*/
 
 /*---------------------------------- LOCAL OBJECTS -------------------------------------*/
+static uint8_t EEPROM[EEPROM_SIZE];
 
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
-static void RunAllTests(void);
-
-/*======================================================================================*/
-/*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
-/*======================================================================================*/
-static void RunAllTests(void)
-{
-  RUN_TEST_GROUP(FIFO);
-}
 
 /*======================================================================================*/
 /*                  ####### EXPORTED FUNCTIONS DEFINITIONS #######                      */
 /*======================================================================================*/
-int main(int argc, const char * argv[])
+void EEPD_Init(void)
 {
-  return UnityMain(argc, argv, RunAllTests);
+  memset((void*)EEPROM, EEPROM_INIT_VALUE, EEPROM_SIZE);
 }
+
+uint8_t EEPD_ReadByte(uint32_t address)
+{
+  return EEPROM[address - EEPROM_START_ADDR];
+}
+
+void EEPD_WriteByte(uint32_t address, uint8_t byte)
+{
+  EEPROM[address - EEPROM_START_ADDR] = byte;
+}
+
+/*======================================================================================*/
+/*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
+/*======================================================================================*/
+
+/**
+ * @}
+ */
