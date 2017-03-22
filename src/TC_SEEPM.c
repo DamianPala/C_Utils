@@ -89,6 +89,8 @@ TEST_TEAR_DOWN(SEEPM)
 
 }
 
+// TODO: Try add test for CRC calc
+
 TEST(SEEPM, EEPD_should_WriteAndReadProperly)
 {
   for (uint16_t i = 0; i < EEPROM_SIZE; i++)

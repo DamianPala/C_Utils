@@ -263,7 +263,7 @@ bool SEEPM_TestMemory(void)
 
   SEEPM_Init();
 
-  for (uint16_t i = 0; i < MEM_SIZE / 5 * 2; i++)
+  for (uint16_t i = 0; i < MEM_SIZE / 5 * 3; i++)
   {
     item[1] = i & 0xFF;
     writeRet = SEEPM_WriteItem((void*)item, 5);
@@ -379,7 +379,7 @@ static void CalcItemCrc(MemItem_T *memItem, uint32_t offset, CrcCalcMode_T mode)
 {
   uint8_t remainder = CRC8_INITIAL_VALUE;
 
-  for (uint16_t byte = 0; byte < memItem->dataSize + MEM_ITEM_OVERHEAD_SIZE; byte++)
+  for (uint16_t byte = 0; byte < (memItem->dataSize + MEM_ITEM_OVERHEAD_SIZE - MEM_ITEM_CRC_SIZE); byte++)
   {
     if (0 == byte)
     {
@@ -401,11 +401,11 @@ static void CalcItemCrc(MemItem_T *memItem, uint32_t offset, CrcCalcMode_T mode)
     {
       if (CRC_CALC_DATA_FROM_ARG == mode)
       {
-        remainder ^= CRC8_BYTE_TO_REMAINDER((memItem->data)[byte - MEM_ITEM_OVERHEAD_SIZE - MEM_ITEM_CRC_SIZE]);
+        remainder ^= CRC8_BYTE_TO_REMAINDER((memItem->data)[byte - (MEM_ITEM_OVERHEAD_SIZE - MEM_ITEM_CRC_SIZE)]);
       }
       else /* CRC_CALC_DATA_FROM_READ_MEM == mode */
       {
-        remainder ^= CRC8_BYTE_TO_REMAINDER(EEPD_ReadByte(offset + byte - MEM_ITEM_OVERHEAD_SIZE - MEM_ITEM_CRC_SIZE));
+        remainder ^= CRC8_BYTE_TO_REMAINDER(EEPD_ReadByte(offset + byte - (MEM_ITEM_OVERHEAD_SIZE - MEM_ITEM_CRC_SIZE)));
       }
     }
 
