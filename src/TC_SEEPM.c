@@ -168,6 +168,11 @@ TEST(SEEPM, SEEPM_should_ClearMemoryProperly)
   }
 }
 
+TEST(SEEPM, SEEPM_should_PassTestMemoryFnc)
+{
+  TEST_ASSERT_TRUE(SEEPM_TestMemory());
+}
+
 TEST(SEEPM, SEEPM_should_WriteAndReadSmallItemProperly)
 {
   uint8_t item[5] = {0x11, 0x22, 0x33, 0x44, 0x55};

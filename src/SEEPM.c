@@ -254,6 +254,42 @@ void SEEPM_EraseMemory(void)
   }
 }
 
+bool SEEPM_TestMemory(void)
+{
+  uint8_t item[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
+  uint8_t buffer[5];
+  SEEPM_WriteRet_T writeRet;
+  SEEPM_ReadRet_T readRet;
+
+  SEEPM_Init();
+
+  for (uint16_t i = 0; i < MEM_SIZE / 5 * 2; i++)
+  {
+    item[1] = i & 0xFF;
+    writeRet = SEEPM_WriteItem((void*)item, 5);
+    if (writeRet != SEEPM_WRITE_SUCCESS)
+    {
+      return false;
+    }
+
+    readRet = SEEPM_ReadItem((void*)buffer, 5);
+    if (readRet != SEEPM_READ_SUCCESS)
+    {
+      return false;
+    }
+
+    for (uint8_t buffCnt = 0; buffCnt < 5; buffCnt++)
+    {
+      if (buffer[buffCnt] != item[buffCnt])
+      {
+        return false;
+      }
+    }
+  }
+
+    return true;
+}
+
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
 /*======================================================================================*/

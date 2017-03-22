@@ -64,6 +64,7 @@ SEEPM_InitStatus_T SEEPM_Init(void);
 SEEPM_ReadRet_T SEEPM_ReadItem(void *item, uint16_t size);
 SEEPM_WriteRet_T SEEPM_WriteItem(void *item, uint16_t size);
 void SEEPM_EraseMemory(void);
+bool SEEPM_TestMemory(void);
 
 /*======================================================================================*/
 /*                          ####### INLINE FUNCTIONS #######                            */

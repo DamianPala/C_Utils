@@ -38,6 +38,7 @@ TEST_GROUP_RUNNER(FIFO)
 
   RUN_TEST_CASE(SEEPM, SEEPM_should_InitMemoryProperly);
   RUN_TEST_CASE(SEEPM, SEEPM_should_ClearMemoryProperly);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_PassTestMemoryFnc);
   RUN_TEST_CASE(SEEPM, SEEPM_should_ReturnEmptyStatusWhenMemoryIsVirgin);
   RUN_TEST_CASE(SEEPM, EEPD_should_WriteAndReadProperly);
   RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadSmallItemProperly);
