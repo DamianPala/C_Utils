@@ -373,7 +373,7 @@ static void CalcItemCrc(MemItem_T *memItem, uint32_t offset, CrcCalcMode_T mode)
       }
     }
 
-    for (uint8_t bit = 0; bit < 8; bit++)
+    for (uint8_t nbit = 0; nbit < 8; nbit++)
     {
       if (remainder & CRC8_MSBIT)
       {
