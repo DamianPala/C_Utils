@@ -22,10 +22,24 @@
 #include "EEPD.h"
 
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
+#if !defined UNIT_TEST
+
 #define MEM_START_ADDR                    EEPROM_START_ADDR
 #define MEM_SIZE                          EEPROM_SIZE
 #define MEM_END_ADDR                      (MEM_START_ADDR + MEM_SIZE)
 #define MEM_CLEAR_VALUE                   EEPROM_INIT_VALUE
+
+#if MEM_SIZE < 20 || MEM_SIZE > 0xFFFF
+#error Invalid memory size!
+#endif
+
+#else
+static uint32_t MEM_START_ADDR = EEPROM_START_ADDR;
+static uint32_t MEM_SIZE = EEPROM_SIZE;
+static uint32_t MEM_END_ADDR = (EEPROM_START_ADDR + EEPROM_SIZE);
+static uint32_t MEM_CLEAR_VALUE = EEPROM_INIT_VALUE;
+#endif
+
 #define MEM_INITIALIZED_SIGN_VALUE        0xABCD
 #define MEM_INITIALIZED_SIGN_VALUE_SIZE   2
 
@@ -36,10 +50,17 @@
 #define MEM_ITEM_CRC_SIZE                 1
 #define MEM_ITEM_OVERHEAD_SIZE            (MEM_ITEM_HEADER_SIZE + MEM_ITEM_CNT_SIZE + MEM_ITEM_DATASIZE_SIZE + MEM_ITEM_CRC_SIZE)
 
+#ifndef UNIT_TEST
+
 #if (EEPROM_SIZE / 10) > 0xFF
 #define MEM_ITEM_MAX_DATASIZE             128
 #else
 #define MEM_ITEM_MAX_DATASIZE             (EEPROM_SIZE / 10)
+#endif
+#if MEM_ITEM_MAX_DATASIZE > 0xFF
+#error Too big maximum item data size parameter!
+#endif
+
 #endif
 
 #define CRC8_INITIAL_VALUE                0xF1
@@ -70,7 +91,7 @@ typedef struct MemItem_Tag
 {
   uint8_t header;
   uint16_t cnt;
-  uint8_t dataSize;
+  uint16_t dataSize;
   uint8_t *data;
   uint8_t crc;
 } MemItem_T;
@@ -81,9 +102,15 @@ typedef struct MemItem_Tag
 /*--------------------------------- EXPORTED OBJECTS -----------------------------------*/
 
 /*---------------------------------- LOCAL OBJECTS -------------------------------------*/
+#if !defined UNIT_TEST
 uint16_t ActualMemItemCnt = 0;
 uint32_t ActualMemItemAddress = MEM_START_ADDR;
 uint32_t ActualMemItemTotalSize = 0;
+#else
+uint16_t ActualMemItemCnt = 0;
+uint32_t ActualMemItemAddress = EEPROM_START_ADDR;
+uint32_t ActualMemItemTotalSize = 0;
+#endif
 
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
@@ -91,7 +118,7 @@ uint32_t ActualMemItemTotalSize = 0;
 static void FindLastMemItem(void);
 static bool IsMemItemWrittenOk(MemItem_T *memItem);
 static void MakeWraparoundIfNeeded(uint8_t newMemItemTotalSize);
-static void CalcItemCrc(MemItem_T *memItem, uint16_t offset, CrcCalcMode_T mode);
+static void CalcItemCrc(MemItem_T *memItem, uint32_t offset, CrcCalcMode_T mode);
 
 /*======================================================================================*/
 /*                  ####### EXPORTED FUNCTIONS DEFINITIONS #######                      */
@@ -118,36 +145,47 @@ SEEPM_ReadRet_T SEEPM_ReadItem(void *item, uint16_t size)
 {
   MemItem_T readItem;
   uint8_t memItemCrc;
-  uint16_t offset = ActualMemItemAddress;
+  uint32_t offset = ActualMemItemAddress;
+  SEEPM_ReadRet_T ret = SEEPM_READ_ERROR;
 
   readItem.header = EEPD_ReadByte(offset++);
   readItem.cnt = EEPD_ReadByte(offset++) << 8;
   readItem.cnt += EEPD_ReadByte(offset++);
-  readItem.dataSize = EEPD_ReadByte(offset++);
+  readItem.dataSize = size; offset++;
   readItem.data = (uint8_t*)item;
-  for (uint8_t byteCnt = 0; byteCnt < readItem.dataSize; byteCnt++)
+
+  if (readItem.dataSize <= MEM_ITEM_MAX_DATASIZE)
   {
-    readItem.data[byteCnt] = EEPD_ReadByte(offset++);
-  }
+    for (uint16_t byteCnt = 0; byteCnt < readItem.dataSize; byteCnt++)
+    {
+      readItem.data[byteCnt] = EEPD_ReadByte(offset++);
+    }
 
-  memItemCrc = EEPD_ReadByte(offset++);
+    memItemCrc = EEPD_ReadByte(offset++);
 
-  CalcItemCrc(&readItem, 0, CRC_CALC_DATA_FROM_ARG);
+    CalcItemCrc(&readItem, 0, CRC_CALC_DATA_FROM_ARG);
 
-  if (memItemCrc == readItem.crc)
-  {
-    return SEEPM_READ_SUCCESS;
+    if (memItemCrc == readItem.crc)
+    {
+      ret = SEEPM_READ_SUCCESS;
+    }
+    else
+    {
+      ret = SEEPM_READ_ERROR;
+    }
   }
   else
   {
-    return SEEPM_READ_ERROR;
+    ret = SEEPM_READ_ERROR;
   }
+
+  return ret;
 }
 
 SEEPM_WriteRet_T SEEPM_WriteItem(void *item, uint16_t size)
 {
   SEEPM_WriteRet_T ret = SEEPM_WRITE_ERROR;
-  uint16_t offset = 0;
+  uint32_t offset = 0;
   uint8_t newMemItemTotalSize = 0;
   MemItem_T memItem;
 
@@ -169,9 +207,9 @@ SEEPM_WriteRet_T SEEPM_WriteItem(void *item, uint16_t size)
     EEPD_WriteByte(offset++, memItem.header);
     EEPD_WriteByte(offset++, GET_MSBYTE(memItem.cnt));
     EEPD_WriteByte(offset++, GET_LSBYTE(memItem.cnt));
-    EEPD_WriteByte(offset++, memItem.dataSize);
+    EEPD_WriteByte(offset++, (uint8_t)memItem.dataSize);
 
-    for (uint8_t byteCnt = 0; byteCnt < memItem.dataSize; byteCnt++)
+    for (uint16_t byteCnt = 0; byteCnt < memItem.dataSize; byteCnt++)
     {
       EEPD_WriteByte(offset++, (memItem.data)[byteCnt]);
     }
@@ -210,9 +248,9 @@ SEEPM_WriteRet_T SEEPM_WriteItem(void *item, uint16_t size)
 
 void SEEPM_EraseMemory(void)
 {
-  for (uint16_t addr = MEM_START_ADDR; addr < MEM_SIZE; addr++)
+  for (uint16_t addr = 0; addr < MEM_SIZE; addr++)
   {
-    EEPD_WriteByte(addr, MEM_CLEAR_VALUE);
+    EEPD_WriteByte(MEM_START_ADDR + addr, MEM_CLEAR_VALUE);
   }
 }
 
@@ -223,7 +261,7 @@ static void FindLastMemItem(void)
 {
   uint8_t memItemCrc;
   bool isCrcOk;
-  uint16_t offset = MEM_START_ADDR;
+  uint32_t offset = MEM_START_ADDR;
   MemItem_T readItem;
 
   do
@@ -256,7 +294,7 @@ static void FindLastMemItem(void)
 
 static bool IsMemItemWrittenOk(MemItem_T *memItem)
 {
-  uint16_t addr;
+  uint32_t addr;
 
   addr = ActualMemItemAddress + ActualMemItemTotalSize;
   if (EEPD_ReadByte(addr++) != MEM_ITEM_HEADER_VALUE)
@@ -271,11 +309,11 @@ static bool IsMemItemWrittenOk(MemItem_T *memItem)
   {
     return false;
   }
-  if (EEPD_ReadByte(addr++) != GET_LSBYTE(memItem->dataSize))
+  if (EEPD_ReadByte(addr++) != memItem->dataSize)
   {
     return false;
   }
-  for (uint8_t byteCnt = 0; byteCnt < memItem->dataSize; byteCnt++)
+  for (uint16_t byteCnt = 0; byteCnt < memItem->dataSize; byteCnt++)
   {
     if (EEPD_ReadByte(addr++) != (memItem->data)[byteCnt])
     {
@@ -301,11 +339,11 @@ static void MakeWraparoundIfNeeded(uint8_t newMemItemTotalSize)
   }
 }
 
-static void CalcItemCrc(MemItem_T *memItem, uint16_t offset, CrcCalcMode_T mode)
+static void CalcItemCrc(MemItem_T *memItem, uint32_t offset, CrcCalcMode_T mode)
 {
   uint8_t remainder = CRC8_INITIAL_VALUE;
 
-  for (uint8_t byte = 0; byte < memItem->dataSize + MEM_ITEM_OVERHEAD_SIZE; byte++)
+  for (uint16_t byte = 0; byte < memItem->dataSize + MEM_ITEM_OVERHEAD_SIZE; byte++)
   {
     if (0 == byte)
     {

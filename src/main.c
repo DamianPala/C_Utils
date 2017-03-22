@@ -36,10 +36,18 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(CRC, CRC16_should_BeCalculatedProperly);
   RUN_TEST_CASE(CRC, CRC32_should_BeCalculatedProperly);
 
+  RUN_TEST_CASE(SEEPM, SEEPM_should_InitMemoryProperly);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_ClearMemoryProperly);
   RUN_TEST_CASE(SEEPM, SEEPM_should_ReturnEmptyStatusWhenMemoryIsVirgin);
   RUN_TEST_CASE(SEEPM, EEPD_should_WriteAndReadProperly);
   RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadSmallItemProperly);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_NotReadItemWithNotProperSize);
   RUN_TEST_CASE(SEEPM, SEEPM_should_NotWriteToBigItems);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadMaxItemSizedProperlyWhenMaxItemSizeHasMaxValue);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteItemManyTimesToManyWraparoundAndReadItemProperly);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteWholeMemory);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadItemProperlyAfterItsSizeChanged);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadItemProperlyOnHugeMemSpace)
 }
 
 /*======================================================================================*/

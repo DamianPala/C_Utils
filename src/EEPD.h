@@ -25,8 +25,10 @@
 
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
 #define EEPROM_SIZE               1024
-#define EEPROM_START_ADDR         0
+#define EEPROM_START_ADDR         0x310000
 #define EEPROM_INIT_VALUE         0xFF
+
+#define EEPROM_EMULATION_SIZE     0xFFFF
 
 /*---------------------------- LOCAL FUNCTION-LIKE MACROS ------------------------------*/
 
@@ -42,6 +44,7 @@
 /*======================================================================================*/
 /*                    ####### EXPORTED OBJECT DECLARATIONS #######                      */
 /*======================================================================================*/
+extern uint8_t EEPROM[EEPROM_EMULATION_SIZE];
 
 /*======================================================================================*/
 /*                   ####### EXPORTED FUNCTIONS PROTOTYPES #######                      */
