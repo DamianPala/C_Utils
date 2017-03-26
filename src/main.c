@@ -48,7 +48,9 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(SEEPM, SEEPM_should_WriteItemManyTimesToManyWraparoundAndReadItemProperly);
   RUN_TEST_CASE(SEEPM, SEEPM_should_WriteWholeMemory);
   RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadItemProperlyAfterItsSizeChanged);
-  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadItemProperlyOnHugeMemSpace)
+  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadItemProperlyOnHugeMemSpace);
+
+  RUN_TEST_CASE(MISC, IsEven_should_EvalNumberProperly);
 }
 
 /*======================================================================================*/
