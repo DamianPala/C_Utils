@@ -372,6 +372,14 @@ TEST(FIFO, FIFO_should_OverwriteLastItemsWhenPushedMoreItemsThanFifoSizeIteratio
 
   for (uint8_t i = 0; i < ITEM_NUMBER; i++)
   {
+    popRet = SFIFO_GetItem(myFifo, i, (void*)&poppedItem);
+    TEST_ASSERT_EQUAL_HEX32(items[4 - i], poppedItem);
+    TEST_ASSERT_TRUE(popRet);
+    TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, SFIFO_GetItemsInFifo(myFifo));
+  }
+
+  for (uint8_t i = 0; i < ITEM_NUMBER; i++)
+  {
     popRet = SFIFO_PopItem(myFifo, (void*)&poppedItem);
     TEST_ASSERT_EQUAL_HEX32(items[4 - i], poppedItem);
     TEST_ASSERT_TRUE(popRet);
@@ -555,6 +563,163 @@ TEST(FIFO, SFIFO_GetItem_should_ReturnFalseWhenTryToGetNotExistItem)
   }
 
   getRet = SFIFO_GetItem(myFifo, ITEM_NUMBER, (void*)&item);
+  TEST_ASSERT_FALSE(getRet);
+
+  SFIFO_Clear(myFifo);
+  getRet = SFIFO_GetItem(myFifo, 1, (void*)&item);
+  TEST_ASSERT_FALSE(getRet);
+}
+
+TEST(FIFO, SFIFO_GetItem_should_WorksProperlyWhenPushedMoreItemsThanFifoSizeWithOverwrite)
+{
+  enum {ITEM_SIZE = 3};
+  enum {ITEM_NUMBER = 10};
+  bool pushRet, getRet;
+  uint8_t item[ITEM_SIZE];
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+  SFIFO_OverwriteLastItems(myFifo, true);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER + 2; itemCnt++)
+  {
+    item[0] = itemCnt + 0;
+    item[1] = itemCnt + 1;
+    item[2] = itemCnt + 2;
+    pushRet = SFIFO_PushItem(myFifo, (void*)item);
+    TEST_ASSERT_TRUE(pushRet);
+
+    if (itemCnt < ITEM_NUMBER)
+    {
+      TEST_ASSERT_EQUAL_UINT16(itemCnt + 1, SFIFO_GetItemsInFifo(myFifo));
+    }
+    else
+    {
+      TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, SFIFO_GetItemsInFifo(myFifo));
+    }
+  }
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER; itemCnt++)
+  {
+    getRet = SFIFO_GetItem(myFifo, itemCnt, (void*)&item);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 0 + 2, item[0]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 1 + 2, item[1]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 2 + 2, item[2]);
+    TEST_ASSERT_TRUE(getRet);
+  }
+
+  SFIFO_Clear(myFifo);
+  getRet = SFIFO_GetItem(myFifo, 1, (void*)&item);
+  TEST_ASSERT_FALSE(getRet);
+
+
+  for (uint32_t itemCnt = 0; itemCnt < 2 * ITEM_NUMBER + 6; itemCnt++)
+  {
+    item[0] = itemCnt + 0;
+    item[1] = itemCnt + 1;
+    item[2] = itemCnt + 2;
+    pushRet = SFIFO_PushItem(myFifo, (void*)(&item[0]));
+    TEST_ASSERT_TRUE(pushRet);
+
+    if (itemCnt < ITEM_NUMBER)
+    {
+      TEST_ASSERT_EQUAL_UINT16(itemCnt + 1, SFIFO_GetItemsInFifo(myFifo));
+    }
+    else
+    {
+      TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, SFIFO_GetItemsInFifo(myFifo));
+    }
+  }
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER; itemCnt++)
+  {
+    getRet = SFIFO_GetItem(myFifo, itemCnt, (void*)item);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + ITEM_NUMBER + 6, item[0]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 1 + ITEM_NUMBER + 6, item[1]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 2 + ITEM_NUMBER + 6, item[2]);
+    TEST_ASSERT_TRUE(getRet);
+  }
+
+  SFIFO_Clear(myFifo);
+  getRet = SFIFO_GetItem(myFifo, 1, (void*)&item);
+  TEST_ASSERT_FALSE(getRet);
+}
+
+TEST(FIFO, SFIFO_GetItem_should_WorksProperlyWhenFifoIsNotFull)
+{
+  enum {ITEM_SIZE = 3};
+  enum {ITEM_NUMBER = 10};
+  bool pushRet, getRet;
+  uint8_t item[ITEM_SIZE];
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+  SFIFO_OverwriteLastItems(myFifo, true);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER - 2; itemCnt++)
+  {
+    item[0] = itemCnt + 0;
+    item[1] = itemCnt + 1;
+    item[2] = itemCnt + 2;
+    pushRet = SFIFO_PushItem(myFifo, (void*)item);
+    TEST_ASSERT_TRUE(pushRet);
+
+    if (itemCnt < ITEM_NUMBER)
+    {
+      TEST_ASSERT_EQUAL_UINT16(itemCnt + 1, SFIFO_GetItemsInFifo(myFifo));
+    }
+    else
+    {
+      TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, SFIFO_GetItemsInFifo(myFifo));
+    }
+  }
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER - 2; itemCnt++)
+  {
+    getRet = SFIFO_GetItem(myFifo, itemCnt, (void*)&item);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt, item[0]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 1, item[1]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 2, item[2]);
+    TEST_ASSERT_TRUE(getRet);
+  }
+
+  SFIFO_Clear(myFifo);
+  getRet = SFIFO_GetItem(myFifo, 1, (void*)&item);
+  TEST_ASSERT_FALSE(getRet);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER + 2; itemCnt++)
+  {
+    item[0] = itemCnt + 0;
+    item[1] = itemCnt + 1;
+    item[2] = itemCnt + 2;
+    pushRet = SFIFO_PushItem(myFifo, (void*)item);
+    TEST_ASSERT_TRUE(pushRet);
+
+    if (itemCnt < ITEM_NUMBER)
+    {
+      TEST_ASSERT_EQUAL_UINT16(itemCnt + 1, SFIFO_GetItemsInFifo(myFifo));
+    }
+    else
+    {
+      TEST_ASSERT_EQUAL_UINT16(ITEM_NUMBER, SFIFO_GetItemsInFifo(myFifo));
+    }
+  }
+
+  getRet = SFIFO_PopItem(myFifo, (void*)&item);
+  TEST_ASSERT_TRUE(getRet);
+  getRet = SFIFO_PopItem(myFifo, (void*)&item);
+  TEST_ASSERT_TRUE(getRet);
+  getRet = SFIFO_PopItem(myFifo, (void*)&item);
+  TEST_ASSERT_TRUE(getRet);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER - 3; itemCnt++)
+  {
+    getRet = SFIFO_GetItem(myFifo, itemCnt, (void*)&item);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 5 + 0, item[0]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 5 + 1, item[1]);
+    TEST_ASSERT_EQUAL_UINT8(itemCnt + 5 + 2, item[2]);
+    TEST_ASSERT_TRUE(getRet);
+  }
+
+  getRet = SFIFO_GetItem(myFifo, ITEM_NUMBER - 2, (void*)&item);
   TEST_ASSERT_FALSE(getRet);
 
   SFIFO_Clear(myFifo);
