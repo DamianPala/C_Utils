@@ -33,6 +33,11 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(FIFO, SFIFO_GetItem_should_ReturnFalseWhenTryToGetNotExistItem);
   RUN_TEST_CASE(FIFO, SFIFO_GetItem_should_WorksProperlyWhenPushedMoreItemsThanFifoSizeWithOverwrite);
   RUN_TEST_CASE(FIFO, SFIFO_GetItem_should_WorksProperlyWhenFifoIsNotFull);
+  RUN_TEST_CASE(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsNotFull);
+  RUN_TEST_CASE(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsFull);
+  RUN_TEST_CASE(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsOverflowed);
+  RUN_TEST_CASE(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsOverwriten);
+  RUN_TEST_CASE(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyInVariousSimpleCases);
 
   RUN_TEST_CASE(CRC, CRC8_should_BeCalculatedProperly);
   RUN_TEST_CASE(CRC, CRC16_should_BeCalculatedProperly);

@@ -201,6 +201,27 @@ bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem)
   return ret;
 }
 
+bool SFIFO_GetLastPushedItem(SFIFO_T *fifo, void *pToItem)
+{
+  uint16_t offset;
+
+  if (false == SFIFO_IsEmpty(fifo))
+  {
+    offset = fifo->head * fifo->itemSize;
+
+    for (uint16_t byteCnt = 0; byteCnt < fifo->itemSize; byteCnt++)
+    {
+      ((uint8_t*)pToItem)[byteCnt] = fifo->buffer[offset + byteCnt];
+    }
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 void SFIFO_Clear(SFIFO_T *fifo)
 {
   fifo->head = 0;
@@ -242,6 +263,27 @@ uint16_t SFIFO_GetItemsInFifo(SFIFO_T *fifo)
 void SFIFO_OverwriteLastItems(SFIFO_T *fifo, bool overwritable)
 {
   fifo->overwriteLastItems = overwritable;
+}
+
+bool SFIFO_UpdateLastPushedItem(SFIFO_T *fifo, void *pToItem)
+{
+  uint16_t offset;
+
+  if (false == SFIFO_IsEmpty(fifo))
+  {
+    offset = fifo->head * fifo->itemSize;
+
+    for (uint16_t byteCnt = 0; byteCnt < fifo->itemSize; byteCnt++)
+    {
+      fifo->buffer[offset + byteCnt] = ((uint8_t*)pToItem)[byteCnt];
+    }
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 /**

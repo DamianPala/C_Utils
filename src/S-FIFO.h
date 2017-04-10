@@ -141,6 +141,17 @@ bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem);
 
 
 /**
+ * @brief   This function gets item from queue on given index.
+ * @param   [in] fifo       is queue handle equals name of created FIFO queue
+ * @param   [out] pToItem   is pointer to place where obtained item should be written
+ * @return  Result of the getting operation.
+ * @retval  true if item got properly
+ * @retval  false if queue is empty
+ */
+bool SFIFO_GetLastPushedItem(SFIFO_T *fifo, void *pToItem);
+
+
+/**
  * @brief   This function clears queue.
  * @param   [in] fifo       is queue handle equals name of created FIFO queue
  */
@@ -169,6 +180,15 @@ bool SFIFO_IsFull(SFIFO_T *fifo);
  * @return  Number of items in queue.
  */
 uint16_t SFIFO_GetItemsInFifo(SFIFO_T *fifo);
+
+
+/**
+ * @brief   This function updates last item pushed into queue.
+ * @param   [in] fifo       is queue handle equals name of created FIFO queue
+ * @param   [out] pToItem   is pointer to item
+ * @return  True or False
+ */
+bool SFIFO_UpdateLastPushedItem(SFIFO_T *fifo, void *pToItem);
 
 
 /**

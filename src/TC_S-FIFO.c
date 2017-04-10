@@ -682,7 +682,7 @@ TEST(FIFO, SFIFO_GetItem_should_WorksProperlyWhenFifoIsNotFull)
   }
 
   SFIFO_Clear(myFifo);
-  getRet = SFIFO_GetItem(myFifo, 1, (void*)&item);
+  getRet = SFIFO_GetItem(myFifo, 0, (void*)&item);
   TEST_ASSERT_FALSE(getRet);
 
   for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER + 2; itemCnt++)
@@ -723,10 +723,145 @@ TEST(FIFO, SFIFO_GetItem_should_WorksProperlyWhenFifoIsNotFull)
   TEST_ASSERT_FALSE(getRet);
 
   SFIFO_Clear(myFifo);
-  getRet = SFIFO_GetItem(myFifo, 1, (void*)&item);
+  getRet = SFIFO_GetItem(myFifo, 0, (void*)&item);
   TEST_ASSERT_FALSE(getRet);
 }
 
+TEST(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsNotFull)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 10};
+  bool pushRet, updateRet, popRet;
+  uint32_t itemToPush, itemUpdate, itemToPop;
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+
+  itemToPush = 0xABCDDDAA;
+  pushRet = SFIFO_PushItem(myFifo, (void*)&itemToPush);
+  TEST_ASSERT_TRUE(pushRet);
+  TEST_ASSERT_EQUAL_UINT32(1, SFIFO_GetItemsInFifo(myFifo));
+
+  itemUpdate = 0xCDACBBCC;
+  updateRet = SFIFO_UpdateLastPushedItem(myFifo, (void*)&itemUpdate);
+  TEST_ASSERT_TRUE(updateRet);
+
+  popRet = SFIFO_PopItem(myFifo, (void*)&itemToPop);
+  TEST_ASSERT_TRUE(popRet);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToPop);
+}
+
+TEST(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsFull)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 10};
+  bool ret;
+  uint32_t itemUpdate, itemToGet;
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER; itemCnt++)
+  {
+    ret = SFIFO_PushItem(myFifo, (void*)&itemCnt);
+    TEST_ASSERT_TRUE(ret);
+    TEST_ASSERT_EQUAL_UINT16(itemCnt + 1, SFIFO_GetItemsInFifo(myFifo));
+  }
+
+  ret = SFIFO_IsFull(myFifo);
+  TEST_ASSERT_TRUE(ret);
+
+  itemUpdate = 0xCDACBBCC;
+  ret = SFIFO_UpdateLastPushedItem(myFifo, (void*)&itemUpdate);
+  TEST_ASSERT_TRUE(ret);
+
+  ret = SFIFO_GetItem(myFifo, ITEM_NUMBER - 1, (void*)&itemToGet);
+  TEST_ASSERT_TRUE(ret);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToGet);
+}
+
+TEST(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsOverflowed)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 10};
+  bool ret;
+  uint32_t itemUpdate, itemToGet;
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER + 5; itemCnt++)
+  {
+    ret = SFIFO_PushItem(myFifo, (void*)&itemCnt);
+  }
+
+  itemUpdate = 0xCDACBBCC;
+  ret = SFIFO_UpdateLastPushedItem(myFifo, (void*)&itemUpdate);
+  TEST_ASSERT_TRUE(ret);
+
+  ret = SFIFO_GetItem(myFifo, ITEM_NUMBER - 1, (void*)&itemToGet);
+  TEST_ASSERT_TRUE(ret);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToGet);
+
+  ret = SFIFO_GetLastPushedItem(myFifo, (void*)&itemToGet);
+  TEST_ASSERT_TRUE(ret);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToGet);
+}
+
+TEST(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyWhenFifoIsOverwriten)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 10};
+  bool ret;
+  uint32_t itemUpdate, itemToGet;
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+  SFIFO_OverwriteLastItems(myFifo, true);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER + 5; itemCnt++)
+  {
+    ret = SFIFO_PushItem(myFifo, (void*)&itemCnt);
+    TEST_ASSERT_TRUE(ret);
+  }
+
+  itemUpdate = 0xCDACBBCC;
+  ret = SFIFO_UpdateLastPushedItem(myFifo, (void*)&itemUpdate);
+  TEST_ASSERT_TRUE(ret);
+
+  ret = SFIFO_GetItem(myFifo, ITEM_NUMBER - 1, (void*)&itemToGet);
+  TEST_ASSERT_TRUE(ret);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToGet);
+
+  ret = SFIFO_GetLastPushedItem(myFifo, (void*)&itemToGet);
+  TEST_ASSERT_TRUE(ret);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToGet);
+}
+
+TEST(FIFO, SFIFO_UpdateLastItem_should_UpdateLastItemProperlyInVariousSimpleCases)
+{
+  enum {ITEM_SIZE = 4};
+  enum {ITEM_NUMBER = 1105};
+  bool ret;
+  uint32_t itemUpdate, itemToGet;
+
+  SFIFO_Create(myFifo, ITEM_SIZE, ITEM_NUMBER);
+  SFIFO_OverwriteLastItems(myFifo, true);
+
+  for (uint32_t itemCnt = 0; itemCnt < ITEM_NUMBER + 268; itemCnt++)
+  {
+    ret = SFIFO_PushItem(myFifo, (void*)&itemCnt);
+    TEST_ASSERT_TRUE(ret);
+  }
+
+  itemUpdate = 0xCDACBBCC;
+  ret = SFIFO_UpdateLastPushedItem(myFifo, (void*)&itemUpdate);
+  TEST_ASSERT_TRUE(ret);
+
+  ret = SFIFO_GetItem(myFifo, ITEM_NUMBER - 1, (void*)&itemToGet);
+  TEST_ASSERT_TRUE(ret);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToGet);
+
+  ret = SFIFO_GetLastPushedItem(myFifo, (void*)&itemToGet);
+  TEST_ASSERT_TRUE(ret);
+  TEST_ASSERT_EQUAL_HEX32(itemUpdate, itemToGet);
+}
 
 /**
  * @} end of group TC_S-FIFO Static FIFO Queue unit tests
