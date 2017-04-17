@@ -131,6 +131,7 @@ SEEPM_InitStatus_T SEEPM_Init(void)
 
   if (0 == ActualMemItemCnt)
   {
+    SEEPM_EraseMemory();
     ret = SEEPM_INIT_STATUS_EMPTY_MEM;
   }
   else
@@ -296,7 +297,6 @@ bool SEEPM_TestMemory(void)
 static void FindLastMemItem(void)
 {
   uint8_t memItemCrc;
-  bool isCrcOk;
   uint32_t offset = MEM_START_ADDR;
   MemItem_T readItem;
 
@@ -311,21 +311,21 @@ static void FindLastMemItem(void)
 
       CalcItemCrc(&readItem, offset, CRC_CALC_DATA_FROM_READ_MEM);
 
+      offset += readItem.dataSize;
       memItemCrc = EEPD_ReadByte(offset++);
-      if (memItemCrc == readItem.crc)
+      if ( (memItemCrc == readItem.crc) && (readItem.cnt > ActualMemItemCnt) )
       {
         ActualMemItemCnt = readItem.cnt;
         ActualMemItemTotalSize = readItem.dataSize + MEM_ITEM_OVERHEAD_SIZE;
         ActualMemItemAddress = offset - readItem.dataSize - MEM_ITEM_OVERHEAD_SIZE;
-        isCrcOk = true;
       }
       else
       {
-        isCrcOk = false;
+        offset -= MEM_ITEM_OVERHEAD_SIZE - readItem.dataSize + 1;
       }
     }
   }
-  while ( (MEM_ITEM_HEADER_VALUE == readItem.header) && (offset < MEM_END_ADDR) && (true == isCrcOk));
+  while (offset < MEM_END_ADDR);
 }
 
 static bool IsMemItemWrittenOk(MemItem_T *memItem)

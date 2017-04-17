@@ -44,6 +44,8 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(CRC, CRC32_should_BeCalculatedProperly);
 
   RUN_TEST_CASE(SEEPM, SEEPM_should_InitMemoryProperly);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_InitMemoryProperlyAfterReset);
+  RUN_TEST_CASE(SEEPM, SEEPM_should_WriteSingleItemAndResetAndReadItemProperly)
   RUN_TEST_CASE(SEEPM, SEEPM_should_ClearMemoryProperly);
   RUN_TEST_CASE(SEEPM, SEEPM_should_PassTestMemoryFnc);
   RUN_TEST_CASE(SEEPM, SEEPM_should_ReturnEmptyStatusWhenMemoryIsVirgin);

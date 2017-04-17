@@ -153,6 +153,74 @@ TEST(SEEPM, SEEPM_should_InitMemoryProperly)
   TEST_ASSERT_EQUAL(SEEPM_INIT_STATUS_SUCCESS, initStatus);
 }
 
+TEST(SEEPM, SEEPM_should_InitMemoryProperlyAfterReset)
+{
+  SEEPM_InitStatus_T initStatus = SEEPM_INIT_STATUS_ERROR;
+  uint8_t item[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
+  uint8_t buffer[5];
+  SEEPM_WriteRet_T writeRet;
+  SEEPM_ReadRet_T readRet;
+
+  initStatus = SEEPM_Init();
+  TEST_ASSERT_EQUAL(SEEPM_INIT_STATUS_EMPTY_MEM, initStatus);
+
+  for (uint16_t i = 0; i < (MEM_SIZE / (MEM_ITEM_OVERHEAD_SIZE + 5)) / 1; i++)
+  {
+    item[1] = i & 0xFF;
+
+    for (uint8_t buffCnt = 0; buffCnt < 9; buffCnt++)
+    {
+      buffer[buffCnt] = 0;
+    }
+
+    writeRet = SEEPM_WriteItem((void*)item, 5);
+    TEST_ASSERT_EQUAL(SEEPM_WRITE_SUCCESS, writeRet);
+
+    readRet = SEEPM_ReadItem((void*)buffer, 5);
+    TEST_ASSERT_EQUAL(SEEPM_READ_SUCCESS, readRet);
+    TEST_ASSERT_EQUAL_HEX8_ARRAY(item, buffer, 5);
+  }
+
+  ActualMemItemCnt = 0;
+  ActualMemItemAddress = MEM_START_ADDR;
+  ActualMemItemTotalSize = 0;
+  initStatus = SEEPM_Init();
+  TEST_ASSERT_EQUAL(SEEPM_INIT_STATUS_SUCCESS, initStatus);
+
+  readRet = SEEPM_ReadItem((void*)buffer, 5);
+  TEST_ASSERT_EQUAL(SEEPM_READ_SUCCESS, readRet);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(item, buffer, 5);
+}
+
+TEST(SEEPM, SEEPM_should_WriteSingleItemAndResetAndReadItemProperly)
+{
+  SEEPM_InitStatus_T initStatus = SEEPM_INIT_STATUS_ERROR;
+  uint8_t item[5] = {0x11, 0x22, 0x33, 0x44, 0x55};
+  uint8_t buffer[5];
+  SEEPM_WriteRet_T writeRet;
+  SEEPM_ReadRet_T readRet;
+
+  initStatus = SEEPM_Init();
+  TEST_ASSERT_EQUAL(SEEPM_INIT_STATUS_EMPTY_MEM, initStatus);
+
+  writeRet = SEEPM_WriteItem((void*)item, 5);
+  TEST_ASSERT_EQUAL(SEEPM_WRITE_SUCCESS, writeRet);
+
+  readRet = SEEPM_ReadItem((void*)buffer, 5);
+  TEST_ASSERT_EQUAL(SEEPM_READ_SUCCESS, readRet);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(item, buffer, 5);
+
+  ActualMemItemCnt = 0;
+  ActualMemItemAddress = MEM_START_ADDR;
+  ActualMemItemTotalSize = 0;
+  initStatus = SEEPM_Init();
+  TEST_ASSERT_EQUAL(SEEPM_INIT_STATUS_SUCCESS, initStatus);
+
+  readRet = SEEPM_ReadItem((void*)buffer, 5);
+  TEST_ASSERT_EQUAL(SEEPM_READ_SUCCESS, readRet);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(item, buffer, 5);
+}
+
 TEST(SEEPM, SEEPM_should_ClearMemoryProperly)
 {
   SEEPM_Init();
