@@ -164,7 +164,7 @@ TEST(SEEPM, SEEPM_should_InitMemoryProperlyAfterReset)
   initStatus = SEEPM_Init();
   TEST_ASSERT_EQUAL(SEEPM_INIT_STATUS_EMPTY_MEM, initStatus);
 
-  for (uint16_t i = 0; i < (MEM_SIZE / (MEM_ITEM_OVERHEAD_SIZE + 5)) / 1; i++)
+  for (uint16_t i = 0; i < (MEM_SIZE / (MEM_ITEM_OVERHEAD_SIZE + 5)) * 15 / 10; i++)
   {
     item[1] = i & 0xFF;
 
