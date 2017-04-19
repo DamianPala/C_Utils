@@ -205,7 +205,22 @@ uint32_t CRC_CalcIterate(uint8_t byte, CRC_CalcSize_T crcSize)
     }
   }
 
-  return (Remainder ^ finalXorValue);
+  switch(crcSize)
+  {
+    case CRC_CALC_SIZE_8:
+    default:
+    {
+      return (uint8_t)(Remainder ^ finalXorValue);
+    }
+    case CRC_CALC_SIZE_16:
+    {
+      return (uint16_t)(Remainder ^ finalXorValue);
+    }
+    case CRC_CALC_SIZE_32:
+    {
+      return (uint32_t)(Remainder ^ finalXorValue);
+    }
+  }
 }
 
 /*======================================================================================*/
