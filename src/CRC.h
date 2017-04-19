@@ -31,6 +31,12 @@
 /*-------------------------------- OTHER TYPEDEFS --------------------------------------*/
 
 /*------------------------------------- ENUMS ------------------------------------------*/
+typedef enum CRC_CalcSize_Tag
+{
+  CRC_CALC_SIZE_8 = 1,
+  CRC_CALC_SIZE_16,
+  CRC_CALC_SIZE_32,
+} CRC_CalcSize_T;
 
 /*------------------------------- STRUCT AND UNIONS ------------------------------------*/
 
@@ -44,6 +50,8 @@
 uint8_t  CRC_CalcCRC8(uint8_t *data, uint16_t nBytes);
 uint16_t CRC_CalcCRC16(uint8_t *data, uint16_t nBytes);
 uint32_t CRC_CalcCRC32(uint8_t *data, uint16_t nBytes);
+void CRC_CalcIterateStart(CRC_CalcSize_T crcSize);
+uint32_t CRC_CalcIterate(uint8_t byte, CRC_CalcSize_T crcSize);
 
 /*======================================================================================*/
 /*                          ####### INLINE FUNCTIONS #######                            */

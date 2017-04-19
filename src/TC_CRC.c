@@ -49,6 +49,7 @@ TEST_GROUP(CRC);
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
+static uint32_t CalcIterateCrc(uint8_t *data, size_t dataSize, CRC_CalcSize_T crcSize);
 
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
@@ -156,6 +157,19 @@ CRC_TestData_T CRC_TestData[4] =
   }
 };
 
+static uint32_t CalcIterateCrc(uint8_t *data, size_t dataSize, CRC_CalcSize_T crcSize)
+{
+  uint32_t crc;
+
+  CRC_CalcIterateStart(crcSize);
+  for (size_t byteCnt = 0; byteCnt < dataSize; byteCnt++)
+  {
+    crc = CRC_CalcIterate(data[byteCnt], crcSize);
+  }
+
+  return crc;
+}
+
 TEST(CRC, CRC8_should_BeCalculatedProperly)
 {
   uint32_t crc;
@@ -163,18 +177,28 @@ TEST(CRC, CRC8_should_BeCalculatedProperly)
 
   crc = CRC_CalcCRC8(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
   TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
-
-  testIterator++;
-  crc = CRC_CalcCRC8(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_8);
   TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
 
 
   testIterator++;
   crc = CRC_CalcCRC8(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
   TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_8);
+  TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
+
 
   testIterator++;
   crc = CRC_CalcCRC8(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_8);
+  TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
+
+
+  testIterator++;
+  crc = CRC_CalcCRC8(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_8);
   TEST_ASSERT_EQUAL_HEX8(CRC_TestData[testIterator].crc8, crc);
 }
 
@@ -183,25 +207,31 @@ TEST(CRC, CRC16_should_BeCalculatedProperly)
   uint32_t crc;
   uint8_t testIterator = 0;
 
-
   crc = CRC_CalcCRC16(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_16);
   TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
 
 
   testIterator++;
   crc = CRC_CalcCRC16(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
   TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
-
-
-  testIterator++;
-  crc = CRC_CalcCRC16(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_16);
   TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
 
 
   testIterator++;
   crc = CRC_CalcCRC16(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
   TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_16);
+  TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
 
+
+  testIterator++;
+  crc = CRC_CalcCRC16(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_16);
+  TEST_ASSERT_EQUAL_HEX16(CRC_TestData[testIterator].crc16, crc);
 }
 
 TEST(CRC, CRC32_should_BeCalculatedProperly)
@@ -211,15 +241,21 @@ TEST(CRC, CRC32_should_BeCalculatedProperly)
 
   crc = CRC_CalcCRC32(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
   TEST_ASSERT_EQUAL_HEX32(CRC_TestData[testIterator].crc32, crc);
-
-
-  testIterator++;
-  crc = CRC_CalcCRC32(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_16);
   TEST_ASSERT_EQUAL_HEX32(CRC_TestData[testIterator].crc32, crc);
 
 
   testIterator++;
   crc = CRC_CalcCRC32(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  TEST_ASSERT_EQUAL_HEX32(CRC_TestData[testIterator].crc32, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_16);
+  TEST_ASSERT_EQUAL_HEX32(CRC_TestData[testIterator].crc32, crc);
+
+
+  testIterator++;
+  crc = CRC_CalcCRC32(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data));
+  TEST_ASSERT_EQUAL_HEX32(CRC_TestData[testIterator].crc32, crc);
+  CalcIterateCrc(CRC_TestData[testIterator].data, sizeof(CRC_TestData[testIterator].data), CRC_CALC_SIZE_16);
   TEST_ASSERT_EQUAL_HEX32(CRC_TestData[testIterator].crc32, crc);
 
 

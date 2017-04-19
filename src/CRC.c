@@ -56,6 +56,7 @@
 /*--------------------------------- EXPORTED OBJECTS -----------------------------------*/
 
 /*---------------------------------- LOCAL OBJECTS -------------------------------------*/
+static uint32_t Remainder = 0;
 
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
@@ -134,6 +135,77 @@ uint32_t CRC_CalcCRC32(uint8_t *data, uint16_t nBytes)
   }
 
   return (remainder ^ CRC32_FINAL_XOR_VALUE);
+}
+
+void CRC_CalcIterateStart(CRC_CalcSize_T crcSize)
+{
+  switch(crcSize)
+  {
+    case CRC_CALC_SIZE_8:
+    default:
+    {
+      Remainder = CRC8_INITIAL_VALUE;
+      break;
+    }
+    case CRC_CALC_SIZE_16:
+    {
+      Remainder = CRC16_INITIAL_VALUE;
+      break;
+    }
+    case CRC_CALC_SIZE_32:
+    {
+      Remainder = CRC32_INITIAL_VALUE;
+      break;
+    }
+  }
+}
+
+uint32_t CRC_CalcIterate(uint8_t byte, CRC_CalcSize_T crcSize)
+{
+  uint32_t msBit, polynomial, finalXorValue;
+
+  switch(crcSize)
+  {
+    case CRC_CALC_SIZE_8:
+    default:
+    {
+      Remainder ^= CRC8_BYTE_TO_REMAINDER(byte);
+      msBit = CRC8_MSBIT;
+      polynomial = CRC8_POLYNOMIAL;
+      finalXorValue = CRC8_FINAL_XOR_VALUE;
+      break;
+    }
+    case CRC_CALC_SIZE_16:
+    {
+      Remainder ^= CRC16_BYTE_TO_REMAINDER(byte);
+      msBit = CRC16_MSBIT;
+      polynomial = CRC16_POLYNOMIAL;
+      finalXorValue = CRC16_FINAL_XOR_VALUE;
+      break;
+    }
+    case CRC_CALC_SIZE_32:
+    {
+      Remainder ^= CRC32_BYTE_TO_REMAINDER(byte);
+      msBit = CRC32_MSBIT;
+      polynomial = CRC32_POLYNOMIAL;
+      finalXorValue = CRC32_FINAL_XOR_VALUE;
+      break;
+    }
+  }
+
+  for (uint8_t nBit = 0; nBit < 8; nBit++)
+  {
+    if (Remainder & msBit)
+    {
+      Remainder = (Remainder << 1) ^ polynomial;
+    }
+    else
+    {
+      Remainder = (Remainder << 1);
+    }
+  }
+
+  return (Remainder ^ finalXorValue);
 }
 
 /*======================================================================================*/
