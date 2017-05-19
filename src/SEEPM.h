@@ -10,6 +10,10 @@
 #ifndef SEEPM_H_
 #define SEEPM_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @addtogroup SEEPM Description
  * @{
@@ -73,5 +77,10 @@ bool SEEPM_TestMemory(void);
 /**
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* SEEPM_H_ */

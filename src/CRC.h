@@ -10,6 +10,10 @@
 #ifndef CRC_H_
 #define CRC_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @addtogroup CRC Description
  * @{
@@ -60,5 +64,9 @@ uint32_t CRC_CalcIterate(uint8_t byte, CRC_CalcSize_T crcSize);
 /**
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CRC_H_ */

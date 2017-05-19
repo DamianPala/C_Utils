@@ -11,6 +11,10 @@
 #ifndef S_FIFO_H_
 #define S_FIFO_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @addtogroup S-FIFO Static FIFO Queue
  * @{
@@ -206,5 +210,9 @@ void SFIFO_OverwriteLastItems(SFIFO_T *fifo, bool overwritable);
 /**
  * @} end of group S-FIFO Static FIFO Queue
  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* S_FIFO_H_ */

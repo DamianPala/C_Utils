@@ -10,6 +10,10 @@
 #ifndef EEPD_H_
 #define EEPD_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @addtogroup SEEPM Description
  * @{
@@ -60,5 +64,9 @@ void EEPD_WriteByte(uint32_t address, uint8_t byte);
 /**
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* EEPD_H_ */

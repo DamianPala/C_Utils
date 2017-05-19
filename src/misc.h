@@ -10,6 +10,10 @@
 #ifndef MISC_H_
 #define MISC_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /**
  * @addtogroup misc Description
  * @{
@@ -59,5 +63,9 @@ bool MISC_IsEven(uint16_t num);
 /**
  * @}
  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MISC_H_ */
