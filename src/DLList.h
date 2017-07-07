@@ -17,7 +17,9 @@ extern "C" {
 /**
  * @addtogroup DLList Description
  * @{
- * @brief Module for... .
+ * @brief Module for Doubly Linked List implementation.
+ *
+ *        List is limited to UINT16_MAX elements
  */
 
 /*======================================================================================*/
@@ -43,15 +45,17 @@ typedef struct Node_Tag Node_T;
 
 struct Node_Tag
 {
-  uint16_t key;
+  uint32_t key;
   Node_T *pPrev;
   Node_T *pNext;
   void *pItem;
+  size_t itemSize; ///< Size in bytes
 };
 
 typedef struct DLList_Tag
 {
   Node_T *pHead;
+  Node_T *pCurrent;
   Node_T *pTail;
   size_t size;
 } DLList_T;
@@ -63,19 +67,23 @@ typedef struct DLList_Tag
 /*======================================================================================*/
 /*                   ####### EXPORTED FUNCTIONS PROTOTYPES #######                      */
 /*======================================================================================*/
+DLList_T* DLList_CreateList(void);
+void DLList_DestroyList(DLList_T *pList);
 bool DLList_IsEmpty(DLList_T * const pList);
 void DLList_PushFront(DLList_T *pList);
-bool DLList_PushBack(DLList_T * const pList, void *pItem);
+bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, uint32_t * const pKey);
 void DLList_PushAfter(DLList_T *pList);
 void DLList_PushBefore(DLList_T *pList);
 
 void DLList_PopFront(DLList_T *pList);
-void DLList_PopBack(DLList_T *pList);
-bool DLList_PopByKey(DLList_T *pList, void *pItem, const uint16_t key);
+bool DLList_PopBack(DLList_T * const pList);
+bool DLList_PopByKey(DLList_T * const pList, const uint32_t key);
 
-bool DLList_GetFirstItem(DLList_T * const pList, void *pItem, uint16_t * const pKey);
-bool DLList_GetLastItem(DLList_T * const pList, void *pItem, uint16_t * const pKey);
-bool DLList_GetItemByKey(DLList_T *pList, uint16_t key, void *item);
+bool DLList_StartTraverse(DLList_T * const pList);
+bool DLList_GetFront(DLList_T * const pList, void *pItem, uint32_t * const pKey);
+bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *itemSize, uint32_t * const pKey);
+bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *itemSize);
+bool DLList_GetNext(DLList_T * const pList, void *pItem, uint32_t * const pKey);
 
 size_t DLList_GetLength(DLList_T *pList);
 

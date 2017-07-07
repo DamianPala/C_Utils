@@ -60,6 +60,9 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(SEEPM, SEEPM_should_WriteAndReadItemProperlyOnHugeMemSpace);
 
   RUN_TEST_CASE(MISC, IsEven_should_EvalNumberProperly);
+
+  RUN_TEST_CASE(TC_DLList, TC_DLList_should_PushItemBackProperly);
+  RUN_TEST_CASE(TC_DLList, TC_DLList_should_PushBackAndGetLargeNumberOfItemProperly);
 }
 
 /*======================================================================================*/
