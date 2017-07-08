@@ -330,6 +330,64 @@ TEST(TC_DLList, TC_DLList_should_TraverseForwardProperly)
   TEST_ASSERT_FALSE(retVal);
 }
 
+TEST(TC_DLList, TC_DLList_should_TraverseFromGivenItem)
+{
+  uint32_t itemToPush;
+  uint32_t *itemToGet = NULL;
+  uint32_t pushKey, getKey;
+  size_t itemSize;
+  bool retVal;
+
+  itemToPush = 1;
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  TEST_ASSERT_TRUE(retVal);
+  itemToPush = 2;
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  TEST_ASSERT_TRUE(retVal);
+  itemToPush = 3;
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  TEST_ASSERT_TRUE(retVal);
+  itemToPush = 4;
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  TEST_ASSERT_TRUE(retVal);
+  itemToPush = 5;
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  TEST_ASSERT_TRUE(retVal);
+
+  retVal = DLList_StartTraverseWithGivenItem(List, 2);
+  TEST_ASSERT_TRUE(retVal);
+
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  TEST_ASSERT_TRUE(retVal);
+  TEST_ASSERT_EQUAL_HEX32(3, *itemToGet);
+  TEST_ASSERT_EQUAL_HEX16(2, getKey);
+  TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
+
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  TEST_ASSERT_TRUE(retVal);
+  TEST_ASSERT_EQUAL_HEX32(4, *itemToGet);
+  TEST_ASSERT_EQUAL_HEX16(3, getKey);
+  TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
+
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  TEST_ASSERT_TRUE(retVal);
+  TEST_ASSERT_EQUAL_HEX32(5, *itemToGet);
+  TEST_ASSERT_EQUAL_HEX16(4, getKey);
+  TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
+
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  TEST_ASSERT_FALSE(retVal);
+
+  for (uint32_t i = 0; i < 5; i++)
+  {
+    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+    TEST_ASSERT_TRUE(retVal);
+    retVal = DLList_PopBack(List);
+    TEST_ASSERT_TRUE(retVal);
+    free(itemToGet);
+  }
+}
+
 // TODO: addd test when list is empty and pop, get
 
 /**

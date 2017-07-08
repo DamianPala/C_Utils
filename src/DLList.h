@@ -28,6 +28,7 @@ extern "C" {
 /*-------------------------------- INCLUDE DIRECTIVES ----------------------------------*/
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
 
@@ -84,6 +85,7 @@ bool DLList_GetFront(DLList_T * const pList, void *pItem, DLList_Key_T * const p
 bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T * const pKey);
 bool DLList_GetByKey(DLList_T * const pList, const DLList_Key_T key, void **pItem, size_t *pItemSize);
 bool DLList_StartTraverse(DLList_T * const pList);
+
 bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T *pKey);
 
 size_t DLList_GetLength(DLList_T *pList);

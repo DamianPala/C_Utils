@@ -317,6 +317,23 @@ bool DLList_StartTraverse(DLList_T * const pList)
   return true;
 }
 
+bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, const DLList_Key_T key)
+{
+  LOC_ASSERT(NULL != pList);
+  if (NULL == pList) return false;
+
+  Node_T *node = pGetNodeByKey(pList, key);
+  if (node != NULL)
+  {
+    pList->pCurrent = node;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T *pKey)
 {
   LOC_ASSERT( (NULL != pList) || (NULL == pItem) );
