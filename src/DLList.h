@@ -19,7 +19,7 @@ extern "C" {
  * @{
  * @brief Module for Doubly Linked List implementation.
  *
- *        List is limited to UINT16_MAX elements
+ *        List is limited to UINT32_MAX elements
  */
 
 /*======================================================================================*/
@@ -68,22 +68,22 @@ typedef struct DLList_Tag
 /*                   ####### EXPORTED FUNCTIONS PROTOTYPES #######                      */
 /*======================================================================================*/
 DLList_T* DLList_CreateList(void);
-void DLList_DestroyList(DLList_T *pList);
+void DLList_DestroyList(DLList_T * const pList);
 bool DLList_IsEmpty(DLList_T * const pList);
 void DLList_PushFront(DLList_T *pList);
 bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, uint32_t * const pKey);
 void DLList_PushAfter(DLList_T *pList);
 void DLList_PushBefore(DLList_T *pList);
 
-void DLList_PopFront(DLList_T *pList);
+bool DLList_PopFront(DLList_T * const pList);
 bool DLList_PopBack(DLList_T * const pList);
 bool DLList_PopByKey(DLList_T * const pList, const uint32_t key);
 
-bool DLList_StartTraverse(DLList_T * const pList);
 bool DLList_GetFront(DLList_T * const pList, void *pItem, uint32_t * const pKey);
 bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *itemSize, uint32_t * const pKey);
 bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *itemSize);
-bool DLList_GetNext(DLList_T * const pList, void *pItem, uint32_t * const pKey);
+bool DLList_StartTraverse(DLList_T * const pList);
+bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *itemSize, uint32_t *pKey);
 
 size_t DLList_GetLength(DLList_T *pList);
 
