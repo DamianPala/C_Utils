@@ -142,7 +142,7 @@ bool DLList_GetFront(DLList_T * const pList, void *pItem, uint32_t * const pKey)
   return true;
 }
 
-bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *itemSize, uint32_t * const pKey)
+bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t * const pKey)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
   if ( (NULL == pList) || (NULL == pItem) ) return false;
@@ -153,9 +153,9 @@ bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *itemSize, uint
   }
 
   *pItem = pList->pTail->pItem;
-  if (itemSize != NULL)
+  if (pItemSize != NULL)
   {
-    *itemSize = pList->pTail->itemSize;
+    *pItemSize = pList->pTail->itemSize;
   }
   if (pKey != NULL)
   {
@@ -165,7 +165,7 @@ bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *itemSize, uint
   return true;
 }
 
-bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *itemSize)
+bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *pItemSize)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
   if ( (NULL == pList) || (NULL == pItem) ) return false;
@@ -175,9 +175,9 @@ bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, s
   if (node != NULL)
   {
     *pItem = node->pItem;
-    if (itemSize != NULL)
+    if (pItemSize != NULL)
     {
-      *itemSize = node->itemSize;
+      *pItemSize = node->itemSize;
     }
     return true;
   }
@@ -317,7 +317,7 @@ bool DLList_StartTraverse(DLList_T * const pList)
   return true;
 }
 
-bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *itemSize, uint32_t *pKey)
+bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t *pKey)
 {
   LOC_ASSERT( (NULL != pList) || (NULL == pItem) );
   if ( (NULL == pList) || (NULL == pItem) ) return false;
@@ -325,9 +325,9 @@ bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *itemSize, uint
   if (pList->pCurrent != NULL)
   {
     *pItem = pList->pCurrent->pItem;
-    if (itemSize != NULL)
+    if (pItemSize != NULL)
     {
-      *itemSize = pList->pCurrent->itemSize;
+      *pItemSize = pList->pCurrent->itemSize;
     }
     if (pKey != NULL)
     {

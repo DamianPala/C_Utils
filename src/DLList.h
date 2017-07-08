@@ -80,10 +80,10 @@ bool DLList_PopBack(DLList_T * const pList);
 bool DLList_PopByKey(DLList_T * const pList, const uint32_t key);
 
 bool DLList_GetFront(DLList_T * const pList, void *pItem, uint32_t * const pKey);
-bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *itemSize, uint32_t * const pKey);
-bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *itemSize);
+bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t * const pKey);
+bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *pItemSize);
 bool DLList_StartTraverse(DLList_T * const pList);
-bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *itemSize, uint32_t *pKey);
+bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t *pKey);
 
 size_t DLList_GetLength(DLList_T *pList);
 
