@@ -42,10 +42,11 @@ extern "C" {
 
 /*------------------------------- STRUCT AND UNIONS ------------------------------------*/
 typedef struct Node_Tag Node_T;
+typedef uint32_t DLList_Key_T;
 
 struct Node_Tag
 {
-  uint32_t key;
+  DLList_Key_T key;
   Node_T *pPrev;
   Node_T *pNext;
   void *pItem;
@@ -71,19 +72,19 @@ DLList_T* DLList_CreateList(void);
 void DLList_DestroyList(DLList_T * const pList);
 bool DLList_IsEmpty(DLList_T * const pList);
 void DLList_PushFront(DLList_T *pList);
-bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, uint32_t * const pKey);
+bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, DLList_Key_T * const pKey);
 void DLList_PushAfter(DLList_T *pList);
 void DLList_PushBefore(DLList_T *pList);
 
 bool DLList_PopFront(DLList_T * const pList);
 bool DLList_PopBack(DLList_T * const pList);
-bool DLList_PopByKey(DLList_T * const pList, const uint32_t key);
+bool DLList_PopByKey(DLList_T * const pList, const DLList_Key_T key);
 
-bool DLList_GetFront(DLList_T * const pList, void *pItem, uint32_t * const pKey);
-bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t * const pKey);
-bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *pItemSize);
+bool DLList_GetFront(DLList_T * const pList, void *pItem, DLList_Key_T * const pKey);
+bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T * const pKey);
+bool DLList_GetByKey(DLList_T * const pList, const DLList_Key_T key, void **pItem, size_t *pItemSize);
 bool DLList_StartTraverse(DLList_T * const pList);
-bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t *pKey);
+bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T *pKey);
 
 size_t DLList_GetLength(DLList_T *pList);
 

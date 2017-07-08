@@ -41,7 +41,7 @@
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
-static Node_T* pGetNodeByKey(DLList_T const *pList, const uint32_t key);
+static Node_T* pGetNodeByKey(DLList_T const *pList, const DLList_Key_T key);
 
 /*======================================================================================*/
 /*                         ####### OBJECT DEFINITIONS #######                           */
@@ -86,7 +86,7 @@ bool DLList_IsEmpty(DLList_T * const pList)
   }
 }
 
-bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, uint32_t * const pKey)
+bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, DLList_Key_T * const pKey)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) || (0 != itemSize) );
   if ( (NULL == pList) || (NULL == pItem) || (0 == itemSize) ) return false;
@@ -126,7 +126,7 @@ bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, uint3
 }
 
 // TODO: finish
-bool DLList_GetFront(DLList_T * const pList, void *pItem, uint32_t * const pKey)
+bool DLList_GetFront(DLList_T * const pList, void *pItem, DLList_Key_T * const pKey)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) || (NULL != pKey) );
   if ( (NULL == pList) || (NULL == pItem) || (NULL == pKey) ) return false;
@@ -142,7 +142,7 @@ bool DLList_GetFront(DLList_T * const pList, void *pItem, uint32_t * const pKey)
   return true;
 }
 
-bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t * const pKey)
+bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T * const pKey)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
   if ( (NULL == pList) || (NULL == pItem) ) return false;
@@ -165,7 +165,7 @@ bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, uin
   return true;
 }
 
-bool DLList_GetByKey(DLList_T * const pList, const uint32_t key, void **pItem, size_t *pItemSize)
+bool DLList_GetByKey(DLList_T * const pList, const DLList_Key_T key, void **pItem, size_t *pItemSize)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
   if ( (NULL == pList) || (NULL == pItem) ) return false;
@@ -264,7 +264,7 @@ bool DLList_PopBack(DLList_T * const pList)
   }
 }
 
-bool DLList_PopByKey(DLList_T * const pList, const uint32_t key)
+bool DLList_PopByKey(DLList_T * const pList, const DLList_Key_T key)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList) return false;
@@ -317,7 +317,7 @@ bool DLList_StartTraverse(DLList_T * const pList)
   return true;
 }
 
-bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, uint32_t *pKey)
+bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T *pKey)
 {
   LOC_ASSERT( (NULL != pList) || (NULL == pItem) );
   if ( (NULL == pList) || (NULL == pItem) ) return false;
@@ -347,7 +347,7 @@ bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, uin
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
 /*======================================================================================*/
-static Node_T* pGetNodeByKey(DLList_T const *pList, const uint32_t key)
+static Node_T* pGetNodeByKey(DLList_T const *pList, const DLList_Key_T key)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList) return NULL;
