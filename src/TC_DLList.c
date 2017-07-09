@@ -81,18 +81,16 @@ TEST(TC_DLList, TC_DLList_should_PushItemBackProperly)
 {
   uint32_t itemToPush = 0xAABBCCDD;
   uint32_t *itemToGet = NULL;
-  uint32_t pushKey, getKey;
   size_t itemSize;
   bool retVal;
 
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&itemToGet);
   TEST_ASSERT_TRUE(retVal);
-  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
 
   TEST_ASSERT_EQUAL_HEX32(itemToPush, *itemToGet);
   TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
-  TEST_ASSERT_EQUAL_HEX16(pushKey, getKey);
 
   DLList_PopBack(List);
   free(itemToGet);
@@ -102,23 +100,21 @@ TEST(TC_DLList, TC_DLList_should_ReturnFalseIfPopAndGetEmpty)
 {
   uint32_t itemToPush = 0xAABBCCDD;
   uint32_t *itemToGet = NULL;
-  uint32_t pushKey, getKey;
   size_t itemSize;
   bool retVal;
 
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&itemToGet);
   TEST_ASSERT_TRUE(retVal);
-  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
 
   TEST_ASSERT_EQUAL_HEX32(itemToPush, *itemToGet);
   TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
-  TEST_ASSERT_EQUAL_HEX16(pushKey, getKey);
 
   DLList_PopBack(List);
   free(itemToGet);
 
-  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_FALSE(retVal);
   retVal = DLList_PopBack(List);
   TEST_ASSERT_FALSE(retVal);
@@ -128,7 +124,6 @@ TEST(TC_DLList, TC_DLList_should_PushBackAndGetLargeNumberOfItemProperly)
 {
   uint32_t itemToPush;
   uint32_t *itemToGet = NULL;
-  uint32_t pushKey, getKey;
   size_t itemSize;
   bool retVal;
   const uint32_t iterations = UINT16_MAX;
@@ -136,34 +131,31 @@ TEST(TC_DLList, TC_DLList_should_PushBackAndGetLargeNumberOfItemProperly)
   for (uint32_t i = 0; i < iterations; i++)
   {
     itemToPush = i;
-    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&itemToGet);
     TEST_ASSERT_TRUE(retVal);
-    TEST_ASSERT_EQUAL_HEX16(i, pushKey);
   }
 
   for (uint32_t i = iterations; i > 0; i--)
   {
-    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
     TEST_ASSERT_TRUE(retVal);
     TEST_ASSERT_EQUAL_HEX32(i - 1, *itemToGet);
-    TEST_ASSERT_EQUAL_HEX16(i - 1, getKey);
     TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
     retVal = DLList_PopBack(List);
     TEST_ASSERT_TRUE(retVal);
     free(itemToGet);
   }
 
-  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_FALSE(retVal);
   retVal = DLList_PopBack(List);
   TEST_ASSERT_FALSE(retVal);
 }
 
-TEST(TC_DLList, TC_DLList_should_GetByKeyAndPopByKeyProperly)
+TEST(TC_DLList, TC_DLList_should_PopByKeyProperly)
 {
   uint32_t itemToPush;
   uint32_t *itemToGet = NULL;
-  uint32_t pushKey;
   size_t itemSize;
   bool retVal;
   const uint32_t items = 10000;
@@ -171,24 +163,15 @@ TEST(TC_DLList, TC_DLList_should_GetByKeyAndPopByKeyProperly)
   for (uint32_t i = 0; i < items; i++)
   {
     itemToPush = i;
-    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&itemToGet);
     TEST_ASSERT_TRUE(retVal);
-    TEST_ASSERT_EQUAL_HEX16(i, pushKey);
   }
 
   for (uint32_t i = items; i > 0; i--)
   {
-    retVal = DLList_GetByKey(List, i - 1, (void**)&itemToGet, &itemSize);
+    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
     TEST_ASSERT_TRUE(retVal);
-    TEST_ASSERT_EQUAL_HEX32(i - 1, *itemToGet);
-    TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
-  }
-
-  for (uint32_t i = items; i > 0; i--)
-  {
-    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, NULL);
-    TEST_ASSERT_TRUE(retVal);
-    retVal = DLList_PopByKey(List, i - 1);
+    retVal = DLList_PopByItem(List, itemToGet);
     TEST_ASSERT_TRUE(retVal);
     free(itemToGet);
   }
@@ -197,67 +180,60 @@ TEST(TC_DLList, TC_DLList_should_GetByKeyAndPopByKeyProperly)
 TEST(TC_DLList, TC_DLList_should_PopByKeyProperlyVarious)
 {
   uint32_t itemToPush;
-  uint32_t *itemToGet = NULL;
-  uint32_t pushKey, getKey;
+  uint32_t *itemToGet[5];
   size_t itemSize;
   bool retVal;
 
   itemToPush = 1;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[0]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 2;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[1]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 3;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[2]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 4;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[3]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 5;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[4]));
   TEST_ASSERT_TRUE(retVal);
 
-  retVal = DLList_GetByKey(List, 0, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  free(itemToGet);
-  retVal = DLList_PopByKey(List, 0);
+  free(itemToGet[0]);
+  retVal = DLList_PopByItem(List, itemToGet[0]);
   TEST_ASSERT_TRUE(retVal);
-  retVal = DLList_GetByKey(List, 1, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  free(itemToGet);
-  retVal = DLList_PopByKey(List, 1);
+  free(itemToGet[1]);
+  retVal = DLList_PopByItem(List, itemToGet[1]);
   TEST_ASSERT_TRUE(retVal);
-  retVal = DLList_GetByKey(List, 3, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  free(itemToGet);
-  retVal = DLList_PopByKey(List, 3);
+  free(itemToGet[3]);
+  retVal = DLList_PopByItem(List, itemToGet[3]);
   TEST_ASSERT_TRUE(retVal);
 
-  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetBack(List, (void**)&(itemToGet[0]), &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  TEST_ASSERT_EQUAL_HEX32(5, *itemToGet);
+  TEST_ASSERT_EQUAL_HEX32(5, *itemToGet[0]);
   TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
-  TEST_ASSERT_EQUAL_HEX16(4, getKey);
   retVal = DLList_PopBack(List);
   TEST_ASSERT_TRUE(retVal);
-  free(itemToGet);
+  free(itemToGet[0]);
 
-  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetBack(List, (void**)&(itemToGet[0]), &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  TEST_ASSERT_EQUAL_HEX32(3, *itemToGet);
+  TEST_ASSERT_EQUAL_HEX32(3, *itemToGet[0]);
   TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
-  TEST_ASSERT_EQUAL_HEX16(2, getKey);
   retVal = DLList_PopBack(List);
   TEST_ASSERT_TRUE(retVal);
-  free(itemToGet);
+  free(itemToGet[0]);
 }
 
 TEST(TC_DLList, TC_DLList_should_PushBigItemsProperly)
 {
   uint32_t itemToPush[100];
   uint32_t *itemToGet = NULL;
-  uint32_t pushKey, getKey;
   size_t itemSize;
   bool retVal;
   const uint32_t items = 1000;
@@ -265,24 +241,22 @@ TEST(TC_DLList, TC_DLList_should_PushBigItemsProperly)
   for (uint32_t i = 0; i < items; i++)
   {
     itemToPush[99] = i;
-    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&itemToGet);
     TEST_ASSERT_TRUE(retVal);
-    TEST_ASSERT_EQUAL_HEX16(i, pushKey);
   }
 
   for (uint32_t i = items; i > 0; i--)
   {
-    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
     TEST_ASSERT_TRUE(retVal);
     TEST_ASSERT_EQUAL_HEX32(i - 1, itemToGet[99]);
-    TEST_ASSERT_EQUAL_HEX16(i - 1, getKey);
     TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
     retVal = DLList_PopBack(List);
     TEST_ASSERT_TRUE(retVal);
     free(itemToGet);
   }
 
-  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_FALSE(retVal);
   retVal = DLList_PopBack(List);
   TEST_ASSERT_FALSE(retVal);
@@ -292,7 +266,6 @@ TEST(TC_DLList, TC_DLList_should_TraverseForwardProperly)
 {
   uint32_t itemToPush;
   uint32_t *itemToGet = NULL;
-  uint32_t pushKey, getKey;
   size_t itemSize;
   bool retVal;
   const uint32_t items = 1000;
@@ -300,31 +273,29 @@ TEST(TC_DLList, TC_DLList_should_TraverseForwardProperly)
   for (uint32_t i = 0; i < items; i++)
   {
     itemToPush = i;
-    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&itemToGet);
     TEST_ASSERT_TRUE(retVal);
-    TEST_ASSERT_EQUAL_HEX16(i, pushKey);
   }
 
   DLList_StartTraverse(List);
   for (uint32_t i = 0; i < items; i++)
   {
-    retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+    retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize);
     TEST_ASSERT_TRUE(retVal);
     TEST_ASSERT_EQUAL_HEX32(i, *itemToGet);
-    TEST_ASSERT_EQUAL_HEX16(i, getKey);
     TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
   }
 
   for (uint32_t i = 0; i < items; i++)
   {
-    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
     TEST_ASSERT_TRUE(retVal);
     retVal = DLList_PopBack(List);
     TEST_ASSERT_TRUE(retVal);
     free(itemToGet);
   }
 
-  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_FALSE(retVal);
   retVal = DLList_PopBack(List);
   TEST_ASSERT_FALSE(retVal);
@@ -333,62 +304,58 @@ TEST(TC_DLList, TC_DLList_should_TraverseForwardProperly)
 TEST(TC_DLList, TC_DLList_should_TraverseFromGivenItem)
 {
   uint32_t itemToPush;
-  uint32_t *itemToGet = NULL;
-  uint32_t pushKey, getKey;
+  uint32_t *itemToGet[5];
   size_t itemSize;
   bool retVal;
 
   itemToPush = 1;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[0]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 2;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[1]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 3;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[2]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 4;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[3]));
   TEST_ASSERT_TRUE(retVal);
   itemToPush = 5;
-  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), &pushKey);
+  retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), (void**)&(itemToGet[4]));
   TEST_ASSERT_TRUE(retVal);
 
-  retVal = DLList_StartTraverseWithGivenItem(List, 2);
+  retVal = DLList_StartTraverseWithGivenItem(List, itemToGet[2]);
   TEST_ASSERT_TRUE(retVal);
 
-  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  TEST_ASSERT_EQUAL_HEX32(3, *itemToGet);
-  TEST_ASSERT_EQUAL_HEX16(2, getKey);
+  TEST_ASSERT_EQUAL_HEX32(3, *itemToGet[2]);
   TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
 
-  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  TEST_ASSERT_EQUAL_HEX32(4, *itemToGet);
-  TEST_ASSERT_EQUAL_HEX16(3, getKey);
+  TEST_ASSERT_EQUAL_HEX32(4, *itemToGet[3]);
   TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
 
-  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_TRUE(retVal);
-  TEST_ASSERT_EQUAL_HEX32(5, *itemToGet);
-  TEST_ASSERT_EQUAL_HEX16(4, getKey);
+  TEST_ASSERT_EQUAL_HEX32(5, *itemToGet[4]);
   TEST_ASSERT_EQUAL_HEX8(sizeof(itemToPush), itemSize);
 
-  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize, &getKey);
+  retVal = DLList_GetNext(List, (void**)&itemToGet, &itemSize);
   TEST_ASSERT_FALSE(retVal);
 
   for (uint32_t i = 0; i < 5; i++)
   {
-    retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize, &getKey);
+    retVal = DLList_GetBack(List, (void**)&(itemToGet[0]), &itemSize);
     TEST_ASSERT_TRUE(retVal);
     retVal = DLList_PopBack(List);
     TEST_ASSERT_TRUE(retVal);
-    free(itemToGet);
+    free(itemToGet[0]);
   }
 }
 
-// TODO: addd test when list is empty and pop, get
+// TODO: add test when list is empty and pop, get
 
 /**
  * @} end of group TC_DLList

@@ -22,7 +22,6 @@
 #include "assert.h"
 
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
-#define KEY_INIT_VALUE                0
 
 /*---------------------------- LOCAL FUNCTION-LIKE MACROS ------------------------------*/
 #define LOC_ASSERT(exp)               //LOC_ASSERT(exp) // to your implementation
@@ -41,7 +40,7 @@
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
-static Node_T* pGetNodeByKey(DLList_T const *pList, const DLList_Key_T key);
+static Node_T* pGetNodeByItem(DLList_T const *pList, const void * const pItem);
 
 /*======================================================================================*/
 /*                         ####### OBJECT DEFINITIONS #######                           */
@@ -86,10 +85,10 @@ bool DLList_IsEmpty(DLList_T * const pList)
   }
 }
 
-bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, DLList_Key_T * const pKey)
+bool DLList_PushBack(DLList_T * const pList, void *pItemIn, size_t itemSize, void **ppItemOut)
 {
-  LOC_ASSERT( (NULL != pList) || (NULL != pItem) || (0 != itemSize) );
-  if ( (NULL == pList) || (NULL == pItem) || (0 == itemSize) ) return false;
+  LOC_ASSERT( (NULL != pList) || (NULL != pItemIn) || (0 != itemSize) );
+  if ( (NULL == pList) || (NULL == pItemIn) || (0 == itemSize) ) return false;
 
   Node_T *newNode = (Node_T*)malloc(sizeof(Node_T));
   LOC_ASSERT(NULL != newNode);
@@ -98,93 +97,67 @@ bool DLList_PushBack(DLList_T * const pList, void *pItem, size_t itemSize, DLLis
   newNode->pItem = malloc(itemSize);
   LOC_ASSERT(NULL != newNode);
   if (NULL == newNode) return false;
-  memcpy(newNode->pItem, pItem, itemSize);
+  memcpy(newNode->pItem, pItemIn, itemSize);
 
   newNode->itemSize = itemSize;
   newNode->pNext = NULL;
 
   if (DLList_IsEmpty(pList))
   {
-    newNode->key = KEY_INIT_VALUE;
     pList->pHead = newNode;
     pList->pHead->pPrev = NULL;
     pList->pTail = pList->pHead;
   }
   else
   {
-    newNode->key = pList->pTail->key + 1;
     newNode->pPrev = pList->pTail;
     pList->pTail->pNext = newNode;
     pList->pTail = newNode;
   }
 
-  *pKey = newNode->key;
+  *ppItemOut = newNode->pItem;
 
   pList->size++;
 
   return true;
 }
 
-// TODO: finish
-bool DLList_GetFront(DLList_T * const pList, void *pItem, DLList_Key_T * const pKey)
+bool DLList_GetFront(DLList_T * const pList, void **ppItem, size_t *pItemSize)
 {
-  LOC_ASSERT( (NULL != pList) || (NULL != pItem) || (NULL != pKey) );
-  if ( (NULL == pList) || (NULL == pItem) || (NULL == pKey) ) return false;
+  LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
+  if ( (NULL == pList) || (NULL == ppItem) ) return false;
 
   if (DLList_IsEmpty(pList))
   {
     return false;
   }
 
-  pItem = pList->pHead->pItem;
-  *pKey = pList->pHead->key;
+  *ppItem = pList->pHead->pItem;
+  if (pItemSize != NULL)
+  {
+    *pItemSize = pList->pHead->itemSize;
+  }
 
   return true;
 }
 
-bool DLList_GetBack(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T * const pKey)
+bool DLList_GetBack(DLList_T * const pList, void **ppItem, size_t *pItemSize)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
-  if ( (NULL == pList) || (NULL == pItem) ) return false;
+  if ( (NULL == pList) || (NULL == ppItem) ) return false;
 
   if (DLList_IsEmpty(pList))
   {
     return false;
   }
 
-  *pItem = pList->pTail->pItem;
+  *ppItem = pList->pTail->pItem;
   if (pItemSize != NULL)
   {
     *pItemSize = pList->pTail->itemSize;
   }
-  if (pKey != NULL)
-  {
-    *pKey = pList->pTail->key;
-  }
 
   return true;
-}
-
-bool DLList_GetByKey(DLList_T * const pList, const DLList_Key_T key, void **pItem, size_t *pItemSize)
-{
-  LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
-  if ( (NULL == pList) || (NULL == pItem) ) return false;
-
-  Node_T *node = pGetNodeByKey(pList, key);
-
-  if (node != NULL)
-  {
-    *pItem = node->pItem;
-    if (pItemSize != NULL)
-    {
-      *pItemSize = node->itemSize;
-    }
-    return true;
-  }
-  else
-  {
-    return false;
-  }
 }
 
 size_t DLList_GetLength(DLList_T * const pList)
@@ -264,12 +237,12 @@ bool DLList_PopBack(DLList_T * const pList)
   }
 }
 
-bool DLList_PopByKey(DLList_T * const pList, const DLList_Key_T key)
+bool DLList_PopByItem(DLList_T * const pList, void * const pItem)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList) return false;
 
-  Node_T *node = pGetNodeByKey(pList, key);
+  Node_T *node = pGetNodeByItem(pList, pItem);
   if (node != NULL)
   {
     if (1 == pList->size)
@@ -317,12 +290,12 @@ bool DLList_StartTraverse(DLList_T * const pList)
   return true;
 }
 
-bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, const DLList_Key_T key)
+bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, void * const pItem)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList) return false;
 
-  Node_T *node = pGetNodeByKey(pList, key);
+  Node_T *node = pGetNodeByItem(pList, pItem);
   if (node != NULL)
   {
     pList->pCurrent = node;
@@ -334,21 +307,17 @@ bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, const DLList_Key_
   }
 }
 
-bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, DLList_Key_T *pKey)
+bool DLList_GetNext(DLList_T * const pList, void **ppItem, size_t *pItemSize)
 {
   LOC_ASSERT( (NULL != pList) || (NULL == pItem) );
-  if ( (NULL == pList) || (NULL == pItem) ) return false;
+  if ( (NULL == pList) || (NULL == ppItem) ) return false;
 
   if (pList->pCurrent != NULL)
   {
-    *pItem = pList->pCurrent->pItem;
+    *ppItem = pList->pCurrent->pItem;
     if (pItemSize != NULL)
     {
       *pItemSize = pList->pCurrent->itemSize;
-    }
-    if (pKey != NULL)
-    {
-      *pKey = pList->pCurrent->key;
     }
 
     pList->pCurrent = pList->pCurrent->pNext;
@@ -364,10 +333,10 @@ bool DLList_GetNext(DLList_T * const pList, void **pItem, size_t *pItemSize, DLL
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
 /*======================================================================================*/
-static Node_T* pGetNodeByKey(DLList_T const *pList, const DLList_Key_T key)
+static Node_T* pGetNodeByItem(DLList_T const *pList, const void * const pItem)
 {
-  LOC_ASSERT(NULL != pList);
-  if (NULL == pList) return NULL;
+  LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
+  if ( (NULL == pList) || (NULL == pItem) ) return NULL;
 
   Node_T *node = NULL;
   size_t nodeIterator = 0;
@@ -376,7 +345,7 @@ static Node_T* pGetNodeByKey(DLList_T const *pList, const DLList_Key_T key)
 
   while (nodeIterator < pList->size)
   {
-    if (key == node->key)
+    if (pItem == node->pItem)
     {
       return node;
     }
