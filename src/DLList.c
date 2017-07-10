@@ -52,10 +52,11 @@ static Node_T* pGetNodeByItem(DLList_T const *pList, const void * const pItem);
 /*======================================================================================*/
 /*                  ####### EXPORTED FUNCTIONS DEFINITIONS #######                      */
 /*======================================================================================*/
-DLList_T* DLList_CreateList(void)
+DLList_T* DLList_CreateList(DLList_Iface_T *iFace)
 {
-  DLList_T *pList = (DLList_T*)malloc(sizeof(DLList_T));
+  DLList_T *pList = (DLList_T*)iFace->MemAlloc(sizeof(DLList_T));
 
+  pList->iFace = iFace;
   pList->pHead = NULL;
   pList->pCurrent = NULL;
   pList->pTail = NULL;
@@ -69,7 +70,7 @@ void DLList_DestroyList(DLList_T * const pList)
   LOC_ASSERT(NULL != pList);
   if (NULL == pList) return;
 
-  free(pList);
+  pList->iFace->MemFree(pList);
 }
 
 bool DLList_IsEmpty(DLList_T * const pList)
@@ -90,11 +91,11 @@ bool DLList_PushBack(DLList_T * const pList, void *pItemIn, size_t itemSize, voi
   LOC_ASSERT( (NULL != pList) || (NULL != pItemIn) || (0 != itemSize) );
   if ( (NULL == pList) || (NULL == pItemIn) || (0 == itemSize) ) return false;
 
-  Node_T *newNode = (Node_T*)malloc(sizeof(Node_T));
+  Node_T *newNode = (Node_T*)pList->iFace->MemAlloc(sizeof(Node_T));
   LOC_ASSERT(NULL != newNode);
   if (NULL == newNode) return false;
 
-  newNode->pItem = malloc(itemSize);
+  newNode->pItem = (Node_T*)pList->iFace->MemAlloc(itemSize);
   LOC_ASSERT(NULL != newNode);
   if (NULL == newNode) return false;
   memcpy(newNode->pItem, pItemIn, itemSize);
@@ -182,7 +183,7 @@ bool DLList_PopFront(DLList_T * const pList)
   {
     if (1 == pList->size)
     {
-      free(pList->pHead);
+      pList->iFace->MemFree(pList->pHead);
       pList->pHead = NULL;
       pList->pCurrent = NULL;
       pList->pTail = NULL;
@@ -192,7 +193,7 @@ bool DLList_PopFront(DLList_T * const pList)
       Node_T *headToFree = pList->pHead;
       pList->pHead = pList->pHead->pNext;
       pList->pHead->pPrev = NULL;
-      free(headToFree);
+      pList->iFace->MemFree(headToFree);
     }
 
     pList->size--;
@@ -214,7 +215,7 @@ bool DLList_PopBack(DLList_T * const pList)
   {
     if (1 == pList->size)
     {
-      free(pList->pTail);
+      pList->iFace->MemFree(pList->pTail);
       pList->pHead = NULL;
       pList->pCurrent = NULL;
       pList->pTail = NULL;
@@ -224,7 +225,7 @@ bool DLList_PopBack(DLList_T * const pList)
       Node_T *tailToFree = pList->pTail;
       pList->pTail = pList->pTail->pPrev;
       pList->pTail->pNext = NULL;
-      free(tailToFree);
+      pList->iFace->MemFree(tailToFree);
     }
 
     pList->size--;
@@ -247,7 +248,7 @@ bool DLList_PopByItem(DLList_T * const pList, void * const pItem)
   {
     if (1 == pList->size)
     {
-      free(node);
+      pList->iFace->MemFree(node);
       pList->pHead = NULL;
       pList->pCurrent = NULL;
       pList->pTail = NULL;
@@ -267,7 +268,7 @@ bool DLList_PopByItem(DLList_T * const pList, void * const pItem)
       {
         node->pPrev->pNext = node->pNext;
         node->pNext->pPrev = node->pPrev;
-        free(node);
+        pList->iFace->MemFree(node);
         pList->size--;
       }
     }

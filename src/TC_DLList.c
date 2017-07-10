@@ -48,6 +48,11 @@
  */
 TEST_GROUP(TC_DLList);
 
+static DLList_Iface_T ListIface =
+{
+  .MemAlloc = malloc,
+  .MemFree = free,
+};
 static DLList_T *List;
 
 /*======================================================================================*/
@@ -66,7 +71,7 @@ static DLList_T *List;
  */
 TEST_SETUP(TC_DLList)
 {
-  List = DLList_CreateList();
+  List = DLList_CreateList(&ListIface);
 }
 
 /**

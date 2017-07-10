@@ -52,8 +52,15 @@ struct Node_Tag
   size_t itemSize; ///< Size in bytes
 };
 
+typedef struct DLList_Iface_Tag
+{
+  void* (*MemAlloc)(size_t size);
+  void  (*MemFree)(void*);
+} DLList_Iface_T;
+
 typedef struct DLList_Tag
 {
+  DLList_Iface_T *iFace;
   Node_T *pHead;
   Node_T *pCurrent;
   Node_T *pTail;
@@ -67,7 +74,7 @@ typedef struct DLList_Tag
 /*======================================================================================*/
 /*                   ####### EXPORTED FUNCTIONS PROTOTYPES #######                      */
 /*======================================================================================*/
-DLList_T* DLList_CreateList(void);
+DLList_T* DLList_CreateList(DLList_Iface_T *iFace);
 void DLList_DestroyList(DLList_T * const pList);
 bool DLList_IsEmpty(DLList_T * const pList);
 void DLList_PushFront(DLList_T *pList);
