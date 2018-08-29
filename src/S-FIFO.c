@@ -43,13 +43,13 @@
 /*======================================================================================*/
 /*                    ####### LOCAL FUNCTIONS PROTOTYPES #######                        */
 /*======================================================================================*/
-static inline bool ShouldHeadBeWraparound(SFIFO_T *fifo);
-static inline void ShouldTailBeWraparound(SFIFO_T *fifo);
+static inline bool ShouldHeadBeWraparound(SFIFO_T * const fifo);
+static inline void ShouldTailBeWraparound(SFIFO_T * const fifo);
 
 /*======================================================================================*/
 /*                   ####### LOCAL FUNCTIONS DEFINITIONS #######                        */
 /*======================================================================================*/
-static inline bool ShouldHeadBeWraparound(SFIFO_T *fifo)
+static inline bool ShouldHeadBeWraparound(SFIFO_T * const fifo)
 {
   if (fifo->head == fifo->queueSizeInItems - 1)
   {
@@ -62,7 +62,7 @@ static inline bool ShouldHeadBeWraparound(SFIFO_T *fifo)
   }
 }
 
-static inline void ShouldTailBeWraparound(SFIFO_T *fifo)
+static inline void ShouldTailBeWraparound(SFIFO_T * const fifo)
 {
   if ( (fifo->tail == fifo->queueSizeInItems) && ( fifo->tail > fifo->head - 1) )
   {
@@ -81,7 +81,7 @@ static inline void ShouldTailBeWraparound(SFIFO_T *fifo)
 /*======================================================================================*/
 /*                  ####### EXPORTED FUNCTIONS DEFINITIONS #######                      */
 /*======================================================================================*/
-bool SFIFO_PushItem(SFIFO_T *fifo, void *pToItem)
+bool SFIFO_PushItem(SFIFO_T * const fifo, void const * const pToItem)
 {
   bool ret;
 
@@ -130,7 +130,7 @@ bool SFIFO_PushItem(SFIFO_T *fifo, void *pToItem)
   return ret;
 }
 
-bool SFIFO_PopItem(SFIFO_T *fifo, void *pToItem)
+bool SFIFO_PopItem(SFIFO_T * const fifo, void * const pToItem)
 {
   bool ret;
 
@@ -170,7 +170,7 @@ bool SFIFO_PopItem(SFIFO_T *fifo, void *pToItem)
   return ret;
 }
 
-bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem)
+bool SFIFO_GetItem(SFIFO_T * const fifo, uint16_t itemIndex, void * const pToItem)
 {
   bool ret;
   uint16_t offset;
@@ -201,7 +201,7 @@ bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem)
   return ret;
 }
 
-bool SFIFO_GetLastPushedItem(SFIFO_T *fifo, void *pToItem)
+bool SFIFO_GetLastPushedItem(SFIFO_T * const fifo, void * const pToItem)
 {
   uint16_t offset;
 
@@ -222,7 +222,7 @@ bool SFIFO_GetLastPushedItem(SFIFO_T *fifo, void *pToItem)
   }
 }
 
-void SFIFO_Clear(SFIFO_T *fifo)
+void SFIFO_Clear(SFIFO_T * const fifo)
 {
   fifo->head = 0;
   fifo->tail = 0;
@@ -231,7 +231,7 @@ void SFIFO_Clear(SFIFO_T *fifo)
   fifo->itemsCnt = 0;
 }
 
-bool SFIFO_IsEmpty(SFIFO_T *fifo)
+bool SFIFO_IsEmpty(SFIFO_T * const fifo)
 {
   if (0 == fifo->itemsCnt)
   {
@@ -243,7 +243,7 @@ bool SFIFO_IsEmpty(SFIFO_T *fifo)
   }
 }
 
-bool SFIFO_IsFull(SFIFO_T *fifo)
+bool SFIFO_IsFull(SFIFO_T * const fifo)
 {
   if (fifo->itemsCnt == fifo->queueSizeInItems)
   {
@@ -255,17 +255,17 @@ bool SFIFO_IsFull(SFIFO_T *fifo)
   }
 }
 
-uint16_t SFIFO_GetItemsInFifo(SFIFO_T *fifo)
+uint16_t SFIFO_GetItemsInFifo(SFIFO_T * const fifo)
 {
   return fifo->itemsCnt;
 }
 
-void SFIFO_OverwriteLastItems(SFIFO_T *fifo, bool overwritable)
+void SFIFO_OverwriteLastItems(SFIFO_T * const fifo, bool overwritable)
 {
   fifo->overwriteLastItems = overwritable;
 }
 
-bool SFIFO_UpdateLastPushedItem(SFIFO_T *fifo, void *pToItem)
+bool SFIFO_UpdateLastPushedItem(SFIFO_T * const fifo, void const * const pToItem)
 {
   uint16_t offset;
 

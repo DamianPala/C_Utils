@@ -118,7 +118,7 @@ typedef struct SFIFO_Tag
  * @retval  true if item pushed properly
  * @retval  false if queue is full
  */
-bool SFIFO_PushItem(SFIFO_T *fifo, void *pToItem);
+bool SFIFO_PushItem(SFIFO_T * const fifo, void const * const pToItem);
 
 
 /**
@@ -129,7 +129,7 @@ bool SFIFO_PushItem(SFIFO_T *fifo, void *pToItem);
  * @retval  true if item popped properly
  * @retval  false if queue is empty
  */
-bool SFIFO_PopItem(SFIFO_T *fifo, void *pToItem);
+bool SFIFO_PopItem(SFIFO_T * const fifo, void * const pToItem);
 
 
 /**
@@ -141,7 +141,7 @@ bool SFIFO_PopItem(SFIFO_T *fifo, void *pToItem);
  * @retval  true if item got properly
  * @retval  false if queue is empty
  */
-bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem);
+bool SFIFO_GetItem(SFIFO_T * const fifo, uint16_t itemIndex, void * const pToItem);
 
 
 /**
@@ -152,14 +152,14 @@ bool SFIFO_GetItem(SFIFO_T *fifo, uint16_t itemIndex, void *pToItem);
  * @retval  true if item got properly
  * @retval  false if queue is empty
  */
-bool SFIFO_GetLastPushedItem(SFIFO_T *fifo, void *pToItem);
+bool SFIFO_GetLastPushedItem(SFIFO_T * const fifo, void * const pToItem);
 
 
 /**
  * @brief   This function clears queue.
  * @param   [in] fifo       is queue handle equals name of created FIFO queue
  */
-void SFIFO_Clear(SFIFO_T *fifo);
+void SFIFO_Clear(SFIFO_T * const fifo);
 
 
 /**
@@ -167,7 +167,7 @@ void SFIFO_Clear(SFIFO_T *fifo);
  * @param   [in] fifo       is queue handle equals name of created FIFO queue
  * @return  True or False
  */
-bool SFIFO_IsEmpty(SFIFO_T *fifo);
+bool SFIFO_IsEmpty(SFIFO_T * const fifo);
 
 
 /**
@@ -175,7 +175,7 @@ bool SFIFO_IsEmpty(SFIFO_T *fifo);
  * @param   [in] fifo       is queue handle equals name of created FIFO queue
  * @return  True or False
  */
-bool SFIFO_IsFull(SFIFO_T *fifo);
+bool SFIFO_IsFull(SFIFO_T * const fifo);
 
 
 /**
@@ -183,7 +183,7 @@ bool SFIFO_IsFull(SFIFO_T *fifo);
  * @param   [in] fifo       is queue handle equals name of created FIFO queue
  * @return  Number of items in queue.
  */
-uint16_t SFIFO_GetItemsInFifo(SFIFO_T *fifo);
+uint16_t SFIFO_GetItemsInFifo(SFIFO_T * const fifo);
 
 
 /**
@@ -192,7 +192,7 @@ uint16_t SFIFO_GetItemsInFifo(SFIFO_T *fifo);
  * @param   [out] pToItem   is pointer to item
  * @return  True or False
  */
-bool SFIFO_UpdateLastPushedItem(SFIFO_T *fifo, void *pToItem);
+bool SFIFO_UpdateLastPushedItem(SFIFO_T * const fifo, void const * const pToItem);
 
 
 /**
@@ -201,7 +201,7 @@ bool SFIFO_UpdateLastPushedItem(SFIFO_T *fifo, void *pToItem);
  * @param   [in] overwritable   If set to true, queue overwrites last item with new pushed item.
  *                              If set to false, queue operates as normal queue without overwriting items.
  */
-void SFIFO_OverwriteLastItems(SFIFO_T *fifo, bool overwritable);
+void SFIFO_OverwriteLastItems(SFIFO_T * const fifo, bool overwritable);
 
 /*======================================================================================*/
 /*                          ####### INLINE FUNCTIONS #######                            */
