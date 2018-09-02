@@ -52,7 +52,7 @@ static Node_T* pGetNodeByItem(DLList_T const *pList, const void * const pItem);
 /*======================================================================================*/
 /*                  ####### EXPORTED FUNCTIONS DEFINITIONS #######                      */
 /*======================================================================================*/
-DLList_T* DLList_CreateList(DLList_Iface_T *pIface)
+DLList_T* DLList_CreateList(DLList_Iface_T const * const pIface)
 {
   DLList_T *pList = (DLList_T*)pIface->MemAlloc(sizeof(DLList_T));
 
@@ -73,7 +73,7 @@ void DLList_DestroyList(DLList_T * const pList)
   pList->pIface->MemFree(pList);
 }
 
-bool DLList_IsEmpty(DLList_T * const pList)
+bool DLList_IsEmpty(DLList_T const * const pList)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList)
@@ -86,7 +86,7 @@ bool DLList_IsEmpty(DLList_T * const pList)
   }
 }
 
-bool DLList_PushBack(DLList_T * const pList, void *pItemIn, size_t itemSize, void **ppItemOut)
+bool DLList_PushBack(DLList_T * const pList, void const * const pItemIn, size_t itemSize, void **ppItemOut)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItemIn) || (0 != itemSize) );
   if ( (NULL == pList) || (NULL == pItemIn) || (0 == itemSize) ) return false;
@@ -116,14 +116,14 @@ bool DLList_PushBack(DLList_T * const pList, void *pItemIn, size_t itemSize, voi
     pList->pTail = newNode;
   }
 
-  *ppItemOut = newNode->pItem;
+  if (ppItemOut != NULL) *ppItemOut = newNode->pItem;
 
   pList->size++;
 
   return true;
 }
 
-bool DLList_GetFront(DLList_T * const pList, void **ppItem, size_t *pItemSize)
+bool DLList_GetFront(DLList_T * const pList, void **ppItem, size_t * const pItemSize)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
   if ( (NULL == pList) || (NULL == ppItem) ) return false;
@@ -142,7 +142,7 @@ bool DLList_GetFront(DLList_T * const pList, void **ppItem, size_t *pItemSize)
   return true;
 }
 
-bool DLList_GetBack(DLList_T * const pList, void **ppItem, size_t *pItemSize)
+bool DLList_GetBack(DLList_T * const pList, void **ppItem, size_t * const pItemSize)
 {
   LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
   if ( (NULL == pList) || (NULL == ppItem) ) return false;
@@ -161,7 +161,7 @@ bool DLList_GetBack(DLList_T * const pList, void **ppItem, size_t *pItemSize)
   return true;
 }
 
-size_t DLList_GetLength(DLList_T * const pList)
+size_t DLList_GetLength(DLList_T const * const pList)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList)
@@ -238,7 +238,7 @@ bool DLList_PopBack(DLList_T * const pList)
   }
 }
 
-bool DLList_PopByItem(DLList_T * const pList, void * const pItem)
+bool DLList_PopByItem(DLList_T * const pList, void const * const pItem)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList) return false;
@@ -291,7 +291,7 @@ bool DLList_StartTraverse(DLList_T * const pList)
   return true;
 }
 
-bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, void * const pItem)
+bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, void const * const pItem)
 {
   LOC_ASSERT(NULL != pList);
   if (NULL == pList) return false;
@@ -308,7 +308,7 @@ bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, void * const pIte
   }
 }
 
-bool DLList_GetNext(DLList_T * const pList, void **ppItem, size_t *pItemSize)
+bool DLList_GetNext(DLList_T * const pList, void **ppItem, size_t * const pItemSize)
 {
   LOC_ASSERT( (NULL != pList) || (NULL == pItem) );
   if ( (NULL == pList) || (NULL == ppItem) ) return false;
