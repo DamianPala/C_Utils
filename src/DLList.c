@@ -24,7 +24,7 @@
 /*----------------------------- LOCAL OBJECT-LIKE MACROS -------------------------------*/
 
 /*---------------------------- LOCAL FUNCTION-LIKE MACROS ------------------------------*/
-#define LOC_ASSERT(exp)               //LOC_ASSERT(exp) // to your implementation
+#define LOC_ASSERT(exp)               assert(exp) // to your implementation
 
 /*======================================================================================*/
 /*                      ####### LOCAL TYPE DECLARATIONS #######                         */
@@ -125,7 +125,7 @@ bool DLList_PushBack(DLList_T * const pList, void const * const pItemIn, size_t 
 
 bool DLList_GetFront(DLList_T * const pList, void **ppItem, size_t * const pItemSize)
 {
-  LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
+  LOC_ASSERT( (NULL != pList) || (NULL != ppItem) );
   if ( (NULL == pList) || (NULL == ppItem) ) return false;
 
   if (DLList_IsEmpty(pList))
@@ -144,7 +144,7 @@ bool DLList_GetFront(DLList_T * const pList, void **ppItem, size_t * const pItem
 
 bool DLList_GetBack(DLList_T * const pList, void **ppItem, size_t * const pItemSize)
 {
-  LOC_ASSERT( (NULL != pList) || (NULL != pItem) );
+  LOC_ASSERT( (NULL != pList) || (NULL != ppItem) );
   if ( (NULL == pList) || (NULL == ppItem) ) return false;
 
   if (DLList_IsEmpty(pList))
@@ -310,7 +310,7 @@ bool DLList_StartTraverseWithGivenItem(DLList_T * const pList, void const * cons
 
 bool DLList_GetNext(DLList_T * const pList, void **ppItem, size_t * const pItemSize)
 {
-  LOC_ASSERT( (NULL != pList) || (NULL == pItem) );
+  LOC_ASSERT( (NULL != pList) || (NULL == ppItem) );
   if ( (NULL == pList) || (NULL == ppItem) ) return false;
 
   if (pList->pCurrent != NULL)
