@@ -73,6 +73,18 @@ void DLList_DestroyList(DLList_T * const pList)
   pList->pIface->MemFree(pList);
 }
 
+void DLList_Clear(DLList_T * const pList)
+{
+  LOC_ASSERT(NULL != pList);
+  if (NULL == pList) return;
+
+  while(!DLList_IsEmpty(pList))
+  {
+    pList->pIface->MemFree(pList->pTail->pItem);
+    (void)DLList_PopBack(pList);
+  }
+}
+
 bool DLList_IsEmpty(DLList_T const * const pList)
 {
   LOC_ASSERT(NULL != pList);

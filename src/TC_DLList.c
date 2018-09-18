@@ -360,6 +360,29 @@ TEST(TC_DLList, TC_DLList_should_TraverseFromGivenItem)
   }
 }
 
+TEST(TC_DLList, TC_DLList_should_ClearProperly)
+{
+  uint32_t itemToPush[100];
+  uint32_t *itemToGet = NULL;
+  size_t itemSize = 0;
+  bool retVal = false;
+  const uint32_t items = 1000;
+
+  for (uint32_t i = 0; i < items; i++)
+  {
+    itemToPush[99] = i;
+    retVal = DLList_PushBack(List, (void*)&itemToPush, sizeof(itemToPush), NULL);
+    TEST_ASSERT_TRUE(retVal);
+  }
+
+  DLList_Clear(List);
+
+  retVal = DLList_GetBack(List, (void**)&itemToGet, &itemSize);
+  TEST_ASSERT_FALSE(retVal);
+  retVal = DLList_PopBack(List);
+  TEST_ASSERT_FALSE(retVal);
+}
+
 // TODO: add test when list is empty and pop, get
 
 /**

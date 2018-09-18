@@ -76,6 +76,7 @@ typedef struct DLList_Tag
 /*======================================================================================*/
 DLList_T* DLList_CreateList(DLList_Iface_T const * const pIface);
 void DLList_DestroyList(DLList_T * const pList);
+void DLList_Clear(DLList_T * const pList);
 bool DLList_IsEmpty(DLList_T const * const pList);
 void DLList_PushFront(DLList_T * const pList);
 bool DLList_PushBack(DLList_T * const pList, void const * const pItemIn, size_t itemSize, void **ppItemOut);

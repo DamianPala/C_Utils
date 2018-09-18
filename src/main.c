@@ -69,6 +69,7 @@ TEST_GROUP_RUNNER(FIFO)
   RUN_TEST_CASE(TC_DLList, TC_DLList_should_PushBigItemsProperly);
   RUN_TEST_CASE(TC_DLList, TC_DLList_should_TraverseForwardProperly);
   RUN_TEST_CASE(TC_DLList, TC_DLList_should_TraverseFromGivenItem);
+  RUN_TEST_CASE(TC_DLList, TC_DLList_should_ClearProperly);
 }
 
 /*======================================================================================*/
